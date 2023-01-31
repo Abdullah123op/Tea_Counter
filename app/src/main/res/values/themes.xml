@@ -1,0 +1,36 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Theme.TeaCounter" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/start</item>-->
+        <item name="colorPrimaryVariant">@color/end</item>-->
+        <item name="colorOnPrimary">@color/white</item>-->
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="statusBarBackground">@drawable/gradiant_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/Theme.TeaCounter.WindowTransition</item>
+    </style>
+
+    <!-- Setting window animation -->
+    <style name="Theme.TeaCounter.WindowTransition">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+    <style name="Theme.TeaCounter.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.TeaCounter.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.TeaCounter.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+</resources>

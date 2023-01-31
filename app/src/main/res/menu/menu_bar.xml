@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/customerHome"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="Home" />
+    <item
+        android:id="@+id/customerOrders"
+        android:icon="@drawable/baseline_shopping_cart_24"
+        android:title="Orders" />
+    <item
+        android:id="@+id/customerRequest"
+        android:icon="@drawable/twotone_add_circle_outline_24"
+        android:title="Request" />
+    <item
+        android:id="@+id/customerBill"
+        android:icon="@drawable/bill"
+        android:title="Bill" />
+    <item
+        android:id="@+id/customerProfile"
+        android:icon="@drawable/baseline_person_24"
+        android:title="Profile" />
+
+</menu>

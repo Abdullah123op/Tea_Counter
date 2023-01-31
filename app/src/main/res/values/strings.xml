@@ -1,0 +1,89 @@
+<resources>
+    <string name="app_name">Tea Counter</string>
+
+    <!--    Error Message  in LoginActivity-->
+    <string name="empty_mb_number">Enter Phone Number</string>
+    <string name="invalid_mb_number">Enter Valid Number</string>
+    <string name="otp_sent_msg">OTP SENT</string>
+
+    <!--    Error Message In DialogBox Fragement-->
+    <string name="otp_empty_error">ENTER VALID OTP</string>
+    <string name="wrong_otp_error">OTP IS INVALID</string>
+    <string name="login_success_msg">Login Is Done Successfully</string>
+    <string name="Otp_resent"><u>Code Resent</u></string>
+
+    <!--    Sigup Activity Text-->
+    <string name="img_pick_title">SELECT AN IMAGE</string>
+    <string name="img_pick_camara">CAMARA</string>
+    <string name="img_pick_gallery">GALLERY</string>
+
+    <!--    radio button and user name errro-->
+    <string name="radio_btn_error">Select User Type</string>
+    <string name="empty_username_error">Field can\'t be empty</string>
+    <string name="long_username_error">Username too long</string>
+
+    <!--    address error-->
+    <string name="empty_address_error">Field can\'t be empty</string>
+    <string name="short_address_error">Enter Valid Address</string>
+
+    <string name="permission_require_error">Required Permission</string>
+
+    <!--    database error-->
+    <string name="saved_database_success_msg">Saved In Database</string>
+    <string name="failed_database_msg">Failed To Save</string>
+
+    <!--    city error-->
+    <string name="empty_city_error">Field can\'t be empty</string>
+    <string name="short_city_error">Enter Valid City</string>
+
+    <!--    LoginActivity XML-->
+    <string name="login_page_title">Login</string>
+    <string name="txt_mobile_number">Mobile Number</string>
+    <string name="btn_submit_txt">Submit</string>
+    <string name="btn_cancel_txt">Cancel</string>
+
+    <!--    DialogBox-->
+    <string name="dialog_title">OTP Verification</string>
+    <string name="title_des">We have sent OTP to.</string>
+    <string name="Resend_txt"><u>Resend Code</u></string>
+
+
+    <!--    signup xml-->
+    <string name="signup_title">Are You?</string>
+    <string name="rd_btn_txt1">Seller</string>
+    <string name="txt_or">OR</string>
+    <string name="rd_btn_txt2">Customer</string>
+
+
+    <string name="txt_name_des">Name</string>
+    <string name="name_hint">Enter Your Name</string>
+
+    <string name="txt_city_des">City</string>
+    <string name="enter_city_hint">City</string>
+
+    <string name="enter_address_hint">Address</string>
+    <string name="title_activity_bottom_navigation">BottomNavigation</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_seller">SellerActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+
+    <string-array name="numbers">
+        <item>Ramesh Bhai 1 </item>
+        <item>Ramesh Bhai 2 </item>
+        <item>Ramesh Bhai 3 </item>
+        <item>Ramesh Bhai 4 </item>
+
+    </string-array>
+    <string name="title_activity_main">MainActivity</string>
+
+</resources>

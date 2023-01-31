@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "910460482301",
+    "project_id": "tea-counter-app",
+    "storage_bucket": "tea-counter-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:910460482301:android:b82a8cfc117f31c1428494",
+        "android_client_info": {
+          "package_name": "com.tea.counter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "910460482301-arqjv386gu86nbq9lfbrj36n4ltkp14u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqSGbFoTFUMPLgceKmdYIUTLq1L_rifYY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "910460482301-arqjv386gu86nbq9lfbrj36n4ltkp14u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
