@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,23 +21,27 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
+import com.tea.counter.adapter.ItemInCustomerAdapter;
+import com.tea.counter.adapter.SpinnerAdapter;
 import com.tea.counter.databinding.DialogRequestBinding;
+import com.tea.counter.model.ItemModel;
+import com.tea.counter.model.SignupModel;
 import com.tea.counter.services.FcmNotificationsSender;
 import com.tea.counter.utils.Constants;
-import com.tea.counter.utils.Preference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class RequestDialog extends AppCompatDialogFragment {
 
     DialogRequestBinding binding;
-    String SelcetedSeller = "";
     String fcmToken;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    String message = "";
+
+    ArrayList<String> messageArraylist = new ArrayList<>();
     private ExampleDialogListener listener;
     private Context mContext;
 
@@ -63,41 +66,68 @@ public class RequestDialog extends AppCompatDialogFragment {
 
 
     public void retriveSeller() {
-
         db.collection(Constants.COLLECTION_NAME).whereEqualTo(Constants.USER_TYPE, "0").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    List<String> spinnerArray = new ArrayList<>();
-                    Map<String, String> fcmTokenMap = new HashMap<>();
+                    ArrayList<SignupModel> arrayList = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        String name = document.getString(Constants.USER_NAME);
-                        String Mobile = document.getString(Constants.MOBILE_NUMBER);
-                        String fcmToken = document.getString(Constants.FCM_TOKEN);
-
-                        Log.d("Seller", "" + name + "= " + Mobile + "Token " + fcmToken);
-
-                        spinnerArray.add(document.getString(Constants.USER_NAME));
-                        fcmTokenMap.put(name, fcmToken);
-
+                        SignupModel signupModel = new SignupModel();
+                        signupModel.setUid((String) document.getData().get(Constants.UID));
+                        signupModel.setMobileNumber((String) document.getData().get(Constants.MOBILE_NUMBER));
+                        signupModel.setUserType((String) document.getData().get(Constants.USER_TYPE));
+                        signupModel.setUserName((String) document.getData().get(Constants.USER_NAME));
+                        signupModel.setAddress((String) document.getData().get(Constants.ADDRESS));
+                        signupModel.setCity((String) document.getData().get(Constants.CITY));
+                        signupModel.setLatitude((String) document.getData().get(Constants.LATITUDE));
+                        signupModel.setLongitude((String) document.getData().get(Constants.LONGITUDE));
+                        signupModel.setImageURL((String) document.getData().get(Constants.IMAGE));
+                        signupModel.setFcmToken((String) document.getData().get(Constants.FCM_TOKEN));
+                        fcmToken = signupModel.getFcmToken();
+                        signupModel.setMyArrayList((ArrayList<HashMap<String, Object>>) document.getData().get(Constants.ITEM_ARRAY_LIST));
+                        arrayList.add(signupModel);
                     }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, spinnerArray);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    binding.spinnerSeller.setAdapter(adapter);
 
+                    SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, arrayList);
+                    binding.spinnerSeller.setAdapter(spinnerAdapter);
                     binding.spinnerSeller.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                            Object item = adapterView.getItemAtPosition(position);
-                            if (item != null) {
-                                SelcetedSeller = adapterView.getItemAtPosition(position).toString();
-                                fcmToken = fcmTokenMap.get(SelcetedSeller);
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            Log.e("11111 : ", new Gson().toJson(arrayList.get(position).getMyArrayList()));
+                            ArrayList<ItemModel> myArrayList = new ArrayList<>();
+                            ArrayList<HashMap<String, Object>> list = arrayList.get(position).getMyArrayList();
+
+                            for (int i = 0; i < list.size(); i++) {
+                                HashMap<String, Object> item = list.get(i);
+                                int itemId = Integer.parseInt(String.valueOf(item.get(Constants.ITEM_ID)));
+                                String itemName = (String) item.get(Constants.ITEM_NAME);
+                                String itemPrice = (String) item.get(Constants.ITEM_PRICE);
+
+                                ItemModel itemModel = new ItemModel(itemId, itemName, itemPrice);
+                                myArrayList.add(itemModel);
+                                for (ItemModel item2 : myArrayList) {
+                                    Log.d("ArrayList Contents", "Id: " + item2.getId() + " Name: " + item2.getItemName() + " Price: " + item2.getPrice());
+                                }
                             }
+                            ItemInCustomerAdapter adapter = new ItemInCustomerAdapter(myArrayList, new ItemInCustomerAdapter.ItemClick() {
+
+                                @Override
+                                public void onClick(ArrayList<ItemModel> dataList) {
+                                    Log.e("11111 : ", new Gson().toJson(dataList));
+                                    for (ItemModel dataItem : dataList) {
+                                        if (dataItem.getClick()) {
+                                            messageArraylist.add(dataItem.getItemName());
+                                        }
+                                    }
+
+                                }
+                            });
+                            binding.recyclerViewCustomerRequest.setAdapter(adapter);
                         }
 
                         @Override
                         public void onNothingSelected(AdapterView<?> parent) {
-                            //Toast.makeText(mContext, "Not Selected", Toast.LENGTH_SHORT).show();
+
                         }
                     });
                 } else {
@@ -111,23 +141,8 @@ public class RequestDialog extends AppCompatDialogFragment {
         binding.btnRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String selectedTea = "";
-                String selectedCoffee = "";
-                String selectedBiscuit = "";
-
-                if (binding.btnTea.isChecked()) {
-                    selectedTea = binding.btnTea.getText().toString();
-                }
-                if (binding.btnCoffe.isChecked()) {
-                    selectedCoffee = binding.btnCoffe.getText().toString();
-                }
-                if (binding.btnBiscuit.isChecked()) {
-                    selectedBiscuit = binding.btnBiscuit.getText().toString();
-                }
-                String rMessage = "SellerName = " + SelcetedSeller + "\nRequestedItem = " + selectedTea + selectedCoffee + selectedBiscuit;
-                String notifiCationMessage = "" + Preference.getName(mContext) + " Wants " + selectedTea + " and " + selectedCoffee + selectedBiscuit;
-                Log.d("Message ", "" + rMessage);
-                msgSend(notifiCationMessage);
+                Log.d("3333 ", "" + messageArraylist);
+                //  msgSend(message);
             }
         });
         binding.btnCancelInRequestDialog.setOnClickListener(v -> dismiss());

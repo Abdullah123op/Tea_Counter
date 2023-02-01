@@ -1,5 +1,8 @@
 package com.tea.counter.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class SignupModel {
     private String mobileNumber;
     private String userType;
@@ -11,6 +14,16 @@ public class SignupModel {
     private String ImageURL;
     private String FcmToken;
     private String Uid;
+
+    private ArrayList<HashMap<String, Object>>  myArrayList = new ArrayList<>();
+
+    public ArrayList<HashMap<String, Object>> getMyArrayList() {
+        return myArrayList;
+    }
+
+    public void setMyArrayList(ArrayList<HashMap<String, Object>> myArrayList) {
+        this.myArrayList = myArrayList;
+    }
 
     public String getImageURL() {
         return ImageURL;

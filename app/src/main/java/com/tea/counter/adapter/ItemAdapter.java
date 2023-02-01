@@ -1,6 +1,7 @@
 package com.tea.counter.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.counter.R;
 import com.tea.counter.model.ItemModel;
-import com.tea.counter.ui.Sellerfragments.SItemsFragment;
 
 import java.util.ArrayList;
 
@@ -41,10 +41,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 itemClick.onClick(position);
-//                SItemsFragment sItemsFragment = new SItemsFragment();
-//                sItemsFragment.deleteArrayListdb(position);
-//                notifyDataSetChanged();
             }
         });
 

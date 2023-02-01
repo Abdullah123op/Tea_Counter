@@ -22,10 +22,16 @@ public class Constants {
     public static final String IMAGE = "image";
 
 
-    //Bundle Key Name // name of phoneNumber for bundle and intent is same
+    //TODO Bundle Key Name // name of phoneNumber for bundle and intent is same
     // Main Activity
     public static final String BUNDLE_MB_NO = "phoneNumber";
     public static final String BUNDLE_MAIN_OTP = "mainOTP";
+
+    //TODO ITEM ARRAYLIST OBJECT NAME
+    public static final String ITEM_ID = "id";
+    public static final String ITEM_NAME = "itemName";
+    public static final String ITEM_PRICE = "price";
+
 
 
 }

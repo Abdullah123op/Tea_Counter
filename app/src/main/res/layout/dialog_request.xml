@@ -40,55 +40,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/txtOtpVerificationTitle" />
 
-
-            <LinearLayout
-                android:id="@+id/radioGroup"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewCustomerRequest"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_105sdp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_30sdp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="@dimen/_30sdp"
-
                 android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spinnerSeller">
-
-
-                <CheckBox
-                    android:id="@+id/btnTea"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/white"
-                    android:layoutDirection="rtl"
-                    android:text="Tea"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_15sdp"
-                    android:textStyle="bold" />
-
-                <CheckBox
-                    android:id="@+id/btnCoffe"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/white"
-                    android:layoutDirection="rtl"
-                    android:text="Coffee"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_15sdp"
-                    android:textStyle="bold" />
-
-                <CheckBox
-                    android:id="@+id/btnBiscuit"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/white"
-                    android:layoutDirection="rtl"
-                    android:text="Biscuit"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_15sdp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@+id/spinnerSeller" />
 
 
             <ProgressBar
@@ -107,11 +71,11 @@
                 android:id="@+id/lLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/radioGroup">
+                app:layout_constraintTop_toBottomOf="@+id/recyclerViewCustomerRequest">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnRequest"

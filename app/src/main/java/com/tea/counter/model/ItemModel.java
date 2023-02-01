@@ -5,6 +5,8 @@ public class ItemModel {
     private String itemName;
     private String price;
 
+    private Boolean isClick= false;
+
     public ItemModel(int id, String itemName, String price) {
         this.id = id;
         this.itemName = itemName;
@@ -33,5 +35,13 @@ public class ItemModel {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public Boolean getClick() {
+        return isClick;
+    }
+
+    public void setClick(Boolean click) {
+        isClick = click;
     }
 }

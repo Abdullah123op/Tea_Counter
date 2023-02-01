@@ -15,9 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:lottie_autoPlay="true"
-            app:lottie_speed="2"
             app:lottie_fileName="tea.json"
-            app:lottie_loop="false" />
+            app:lottie_loop="false"
+            app:lottie_speed="3" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>
