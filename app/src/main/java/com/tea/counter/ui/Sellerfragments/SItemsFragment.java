@@ -2,77 +2,165 @@ package com.tea.counter.ui.Sellerfragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.tea.counter.adapter.ItemAdapter;
 import com.tea.counter.databinding.FragmentSItemsBinding;
-import com.tea.counter.dialog.AddItemDialog;
 import com.tea.counter.model.ItemModel;
-import com.tea.counter.utils.MyDBHelper;
+import com.tea.counter.utils.Constants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 
-public class SItemsFragment extends Fragment implements AddItemDialog.AddItemListener {
+public class SItemsFragment extends Fragment {
     FragmentSItemsBinding binding;
-    MyDBHelper dbHelper;
-    ItemAdapter itemAdapter;
+
     ArrayList<ItemModel> myArrayList = new ArrayList<>();
+    ItemAdapter adapter;
+
+    ItemModel itemModel;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSItemsBinding.inflate(inflater, container, false);
+        binding.btnAddItemSubmit.setVisibility(View.GONE);
+        binding.progressBar.setVisibility(View.VISIBLE);
         initView();
         return binding.getRoot();
     }
 
     public void initView() {
-        binding.btnAddItem.setOnClickListener(new View.OnClickListener() {
+        getArrayList();
+        binding.btnAddItemSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-                AddItemDialog addItemDialog = new AddItemDialog();
-                addItemDialog.show(ft, "dialog");
+                binding.btnAddItemSubmit.setVisibility(View.GONE);
+                binding.progressBar.setVisibility(View.VISIBLE);
+                if (!binding.etItemName.getText().toString().isEmpty() && !binding.etPrice.getText().toString().isEmpty()) {
+                    addArrayListdb();
+                    getArrayList();
+                } else {
+                    Toast.makeText(mContext, "Enter Detail Of Item", Toast.LENGTH_SHORT).show();
+
+                }
             }
         });
-        dbHelper = new MyDBHelper(mContext);
 
-        myArrayList = dbHelper.fetchContact();
-        itemAdapter = new ItemAdapter(myArrayList);
-        binding.itemRecyclerView.setAdapter(itemAdapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         binding.itemRecyclerView.setLayoutManager(layoutManager);
     }
 
+
+    public void addArrayListdb() {
+        itemModel = new ItemModel(myArrayList.size() + 1, binding.etItemName.getText().toString(), binding.etPrice.getText().toString());
+        myArrayList.add(itemModel);
+
+        for (ItemModel item : myArrayList) {
+            Log.d("ArrayList Contents", "Id: " + item.getId() + " Name: " + item.getItemName() + " Price: " + item.getPrice());
+        }
+        DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME).document(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()));
+        documentReference.update(Constants.ITEM_ARRAY_LIST, myArrayList).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("ONSUCCESS", "DocumentSnapshot successfully updated!");
+                binding.btnAddItemSubmit.setVisibility(View.VISIBLE);
+                binding.progressBar.setVisibility(View.GONE);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("OnFailure", "Error updating document", e);
+            }
+        });
+    }
+
+
+    public void getArrayList() {
+
+        DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME).document(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()));
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists() && documentSnapshot.contains(Constants.ITEM_ARRAY_LIST)) {
+                    ArrayList<HashMap<String, Object>> list = (ArrayList<HashMap<String, Object>>) documentSnapshot.get(Constants.ITEM_ARRAY_LIST);
+                    myArrayList.clear();
+                    for (int i = 0; i < list.size(); i++) {
+                        HashMap<String, Object> item = list.get(i);
+                        int id = Integer.parseInt(String.valueOf(item.get("id")));
+                        String name = (String) item.get("itemName");
+                        String price = (String) item.get("price");
+
+                        ItemModel itemModel = new ItemModel(id, name, price);
+                        myArrayList.add(itemModel);
+                        for (ItemModel item2 : myArrayList) {
+                            Log.d("ArrayList Contents", "Id: " + item2.getId() + " Name: " + item2.getItemName() + " Price: " + item2.getPrice());
+                        }
+
+                    }
+                    adapter = new ItemAdapter(myArrayList, new ItemAdapter.ItemClick() {
+                        @Override
+                        public void onClick(int position) {
+//                            Toast.makeText(mContext, "" + position, Toast.LENGTH_SHORT).show();
+                            deleteArrayListdb(position);
+                        }
+                    });
+                    binding.itemRecyclerView.setAdapter(adapter);
+                    binding.btnAddItemSubmit.setVisibility(View.VISIBLE);
+                    binding.progressBar.setVisibility(View.GONE);
+                }
+
+            }
+        });
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
-
     }
 
-    @Override
-    public void onAddItemClick(String itemName, String itemPrice) {
-        ItemModel itemModel = new ItemModel(myArrayList.size() + 1, itemName, itemPrice);
-        dbHelper.addContact(itemModel);
-        myArrayList.add(itemModel);
-        itemAdapter.notifyDataSetChanged();
+    public void deleteArrayListdb(int position) {
+        myArrayList.remove(position);
+        adapter.notifyDataSetChanged();
+        DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME).document(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()));
+        documentReference.update(Constants.ITEM_ARRAY_LIST, myArrayList).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("ONSUCCESS", "DocumentSnapshot successfully updated!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("OnFailure", "Error updating document", e);
+            }
+        });
     }
+
+
 }

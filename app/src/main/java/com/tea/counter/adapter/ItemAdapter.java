@@ -1,22 +1,27 @@
 package com.tea.counter.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.counter.R;
 import com.tea.counter.model.ItemModel;
+import com.tea.counter.ui.Sellerfragments.SItemsFragment;
 
 import java.util.ArrayList;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     private final ArrayList<ItemModel> dataList;
+    private final ItemClick itemClick;
 
-    public ItemAdapter(ArrayList<ItemModel> dataList) {
+    public ItemAdapter(ArrayList<ItemModel> dataList, ItemClick itemClick) {
         this.dataList = dataList;
+        this.itemClick = itemClick;
     }
 
     @Override
@@ -27,11 +32,23 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         ItemModel model = dataList.get(position);
         holder.idNumber.setText(String.valueOf(model.getId()));
         holder.txtItemName.setText(model.getItemName());
         holder.txtItemPrice.setText(model.getPrice());
+
+        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                itemClick.onClick(position);
+//                SItemsFragment sItemsFragment = new SItemsFragment();
+//                sItemsFragment.deleteArrayListdb(position);
+//                notifyDataSetChanged();
+            }
+        });
+
+
     }
 
     @Override
@@ -39,16 +56,24 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         return dataList.size();
     }
 
+    public interface ItemClick {
+        void onClick(int position);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView idNumber;
         TextView txtItemName;
         TextView txtItemPrice;
+
+        ImageView btnDelete;
 
         public ViewHolder(View itemView) {
             super(itemView);
             idNumber = itemView.findViewById(R.id.idNumber);
             txtItemName = itemView.findViewById(R.id.txtItemName);
             txtItemPrice = itemView.findViewById(R.id.txtItemPrice);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
+
         }
     }
 }

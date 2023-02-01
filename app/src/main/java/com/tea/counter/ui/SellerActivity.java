@@ -20,7 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.tea.counter.R;
 import com.tea.counter.databinding.ActivitySellerBinding;
-import com.tea.counter.dialog.AddItemDialog;
 import com.tea.counter.ui.Sellerfragments.SBillFragment;
 import com.tea.counter.ui.Sellerfragments.SHomeFragment;
 import com.tea.counter.ui.Sellerfragments.SItemsFragment;
@@ -32,7 +31,7 @@ import com.tea.counter.utils.Preference;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SellerActivity extends AppCompatActivity implements AddItemDialog.AddItemListener {
+public class SellerActivity extends AppCompatActivity {
     ActivitySellerBinding binding;
 
     @Override
@@ -113,12 +112,6 @@ public class SellerActivity extends AppCompatActivity implements AddItemDialog.A
                 }
             });
         });
-
-    }
-
-
-    @Override
-    public void onAddItemClick(String itemName, String itemPrice) {
 
     }
 }

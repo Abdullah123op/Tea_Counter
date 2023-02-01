@@ -1,40 +1,37 @@
 package com.tea.counter.model;
 
 public class ItemModel {
-    private int Id;
-    private String ItemName;
-    private String Price;
+    private int id;
+    private String itemName;
+    private String price;
 
-    public ItemModel(int id, String itemName, String itemPrice) {
-        Id = id;
-        ItemName = itemName;
-        Price = itemPrice;
+    public ItemModel(int id, String itemName, String price) {
+        this.id = id;
+        this.itemName = itemName;
+        this.price = price;
     }
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getItemName() {
-        return ItemName;
+        return itemName;
     }
 
     public void setItemName(String itemName) {
-        ItemName = itemName;
+        this.itemName = itemName;
     }
 
     public String getPrice() {
-        return Price;
+        return price;
     }
 
     public void setPrice(String price) {
-        Price = price;
+        this.price = price;
     }
-
-
-
 }

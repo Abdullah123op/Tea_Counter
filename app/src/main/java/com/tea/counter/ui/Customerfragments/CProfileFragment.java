@@ -96,7 +96,7 @@ public class CProfileFragment extends Fragment {
 
     public void Logout() {
         binding.btnLogoutProfile.setOnClickListener(v -> {
-            Preference.clearAllPref(Objects.requireNonNull(getContext()));
+            Preference.clearAllPref(mContext);
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

@@ -14,6 +14,8 @@ public class Constants {
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
 
+    public static final String ITEM_ARRAY_LIST = "itemArrayList";
+
     //   TODO SignupActivity
     public static final String STORAGE_REF_NAME = "profileImg";
     public static final String FCM_TOKEN = "fcmToken";
