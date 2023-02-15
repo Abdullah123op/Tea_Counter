@@ -3,6 +3,7 @@ package com.tea.counter.ui;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.tea.counter.R;
 import com.tea.counter.databinding.ActivitySellerBinding;
+import com.tea.counter.dialog.ConfirmOrderDialog;
 import com.tea.counter.ui.Sellerfragments.SBillFragment;
 import com.tea.counter.ui.Sellerfragments.SHomeFragment;
 import com.tea.counter.ui.Sellerfragments.SItemsFragment;
@@ -39,6 +41,7 @@ public class SellerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_seller);
         Preference.setIsLogin(this);
+        replaceFragment(new SHomeFragment());
         updateFcm();
         binding.sellerNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -49,8 +52,9 @@ public class SellerActivity extends AppCompatActivity {
                 if (item.getItemId() == R.id.sellerOrder) {
                     replaceFragment(new SOrderFragment());
                 }
-                if (item.getItemId() == R.id.sellerItems) {
-                    replaceFragment(new SItemsFragment());
+                if (item.getItemId() == R.id.confirmOrder) {
+                    ConfirmOrderDialog confirmOrderDialog = new ConfirmOrderDialog();
+                    confirmOrderDialog.show(getSupportFragmentManager(), "Confirm_dialog");
                 }
                 if (item.getItemId() == R.id.sellerBill) {
                     replaceFragment(new SBillFragment());
@@ -59,6 +63,13 @@ public class SellerActivity extends AppCompatActivity {
                     replaceFragment(new SProfileFragment());
                 }
                 return true;
+            }
+        });
+
+        binding.btnItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                replaceFragment(new SItemsFragment());
             }
         });
     }
@@ -90,9 +101,26 @@ public class SellerActivity extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             String currentToken = document.getString(Constants.FCM_TOKEN);
-                            // Compare the current token with the firebaseToken
-                            if (!currentToken.equals(firebaseToken)) {
-                                // Update the database with the new firebaseToken
+                            if (currentToken != null) {
+                                // Compare the current token with the firebaseToken
+                                if (!currentToken.equals(firebaseToken)) {
+                                    // Update the database with the new firebaseToken
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put(Constants.FCM_TOKEN, firebaseToken);
+                                    db.collection(Constants.COLLECTION_NAME).document(documentName).update(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Preference.setFcmToken(SellerActivity.this, firebaseToken);
+                                                Log.d("Token", "Token updated in the database");
+                                            } else {
+                                                Log.e("Token", "Failed to update the token in the database", task.getException());
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                // If the current token is null, add the firebaseToken to the database
                                 Map<String, Object> data = new HashMap<>();
                                 data.put(Constants.FCM_TOKEN, firebaseToken);
                                 db.collection(Constants.COLLECTION_NAME).document(documentName).update(data).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -100,9 +128,9 @@ public class SellerActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             Preference.setFcmToken(SellerActivity.this, firebaseToken);
-                                            Log.d("Token", "Token updated in the database");
+                                            Log.d("Token", "Token added to the database");
                                         } else {
-                                            Log.e("Token", "Failed to update the token in the database", task.getException());
+                                            Log.e("Token", "Failed to add the token to the database", task.getException());
                                         }
                                     }
                                 });
@@ -111,6 +139,7 @@ public class SellerActivity extends AppCompatActivity {
                     }
                 }
             });
+
         });
 
     }

@@ -189,7 +189,6 @@
                     android:layout_height="wrap_content"
                     android:visibility="visible"
                     android:layout_marginBottom="32dp"
-
                     android:layout_marginStart="@dimen/_10sdp"
                     android:background="@drawable/btncancelbackground"
                     android:text="@string/btn_cancel_txt"

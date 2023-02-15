@@ -145,7 +145,7 @@ public class OtpDialog extends AppCompatDialogFragment {
                     binding.progressBar.setVisibility(View.VISIBLE);
                     binding.btnSubmitInDialog1.setVisibility(View.GONE);
                     binding.btnCancel.setVisibility(View.GONE);
-                    ChekDatabse();
+                    CheckDatabase();
                 } else {
                     setOtpError();
 
@@ -168,7 +168,7 @@ public class OtpDialog extends AppCompatDialogFragment {
         Toast.makeText(mContext, getString(R.string.wrong_otp_error), Toast.LENGTH_SHORT).show();
     }
 
-    public void ChekDatabse() {
+    public void CheckDatabase() {
 
         db.collection(Constants.COLLECTION_NAME).whereEqualTo(Constants.MOBILE_NUMBER, phoneNumber).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

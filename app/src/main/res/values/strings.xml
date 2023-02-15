@@ -51,7 +51,7 @@
     <!--    signup xml-->
     <string name="signup_title">Are You?</string>
     <string name="rd_btn_txt1">Seller</string>
-    <string name="txt_or">OR</string>
+    <string name="txt_or">or</string>
     <string name="rd_btn_txt2">Customer</string>
 
 

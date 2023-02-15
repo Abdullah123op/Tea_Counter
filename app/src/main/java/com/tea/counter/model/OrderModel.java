@@ -1,39 +1,78 @@
 package com.tea.counter.model;
 
 public class OrderModel {
-    private String Time;
-    private String Cup;
-    private String Price;
 
-    public OrderModel(String time, String cup, String price) {
-        this.Time = time;
-        this.Cup = cup;
-        this.Price = price;
+    private final String OrderDate;
+    boolean visibility;
+    private String OrderTitle;
+    private String OrderTime;
+    private String OrderPrice;
+    private StringBuilder OrderDetails;
+    private String ImageUrl;
+
+
+
+
+    public OrderModel(String orderTitle, String orderTime, String orderPrice, StringBuilder orderDetails, String imageUrl, String orderDate) {
+        OrderTitle = orderTitle;
+        OrderTime = orderTime;
+        OrderPrice = orderPrice;
+        OrderDetails = orderDetails;
+        ImageUrl = imageUrl;
+        OrderDate = orderDate;
+        this.visibility = false;
     }
 
-
-    public String getTime() {
-        return Time;
+    public String getOrderDate() {
+        return OrderDate;
     }
 
-    public String getCup() {
-        return Cup;
+    public String getImageUrl() {
+        return ImageUrl;
     }
 
-    public void setCup(String cup) {
-        Cup = cup;
+    public void setImageUrl(String imageUrl) {
+        ImageUrl = imageUrl;
     }
 
-    public String getPrice() {
-        return Price;
+    public StringBuilder getOrderDetails() {
+        return OrderDetails;
     }
 
-    public void setPrice(String price) {
-        Price = price;
+    public void setOrderDetails(StringBuilder orderDetails) {
+        OrderDetails = orderDetails;
     }
 
-    public void setTime(String time) {
-        Time = time;
+    public boolean isVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
+    }
+
+    public String getOrderTitle() {
+        return OrderTitle;
+    }
+
+    public void setOrderTitle(String orderTitle) {
+        OrderTitle = orderTitle;
+    }
+
+    public String getOrderTime() {
+        return OrderTime;
+    }
+
+    public void setOrderTime(String orderTime) {
+        OrderTime = orderTime;
+    }
+
+    public String getOrderPrice() {
+        return OrderPrice;
+    }
+
+    public void setOrderPrice(String orderPrice) {
+        OrderPrice = orderPrice;
     }
 
 

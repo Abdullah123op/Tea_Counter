@@ -47,10 +47,8 @@ public class SpinnerAdapter extends BaseAdapter implements android.widget.Spinne
             view = inflater.inflate(R.layout.spinner_item, parent, false);
         }
         TextView textView = view.findViewById(R.id.txtSellerName);
-        // TextView textView = new TextView(mContext);
         textView.setText(dataList.get(position).getUserName());
         return textView;
-
     }
 }
 

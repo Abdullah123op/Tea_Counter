@@ -1,7 +1,6 @@
 package com.tea.counter.adapter;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +61,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         TextView idNumber;
         TextView txtItemName;
         TextView txtItemPrice;
-
         ImageView btnDelete;
 
         public ViewHolder(View itemView) {

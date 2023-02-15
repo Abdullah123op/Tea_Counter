@@ -49,11 +49,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            app:menu="@menu/menu_bar"
-            app:itemTextColor="@drawable/iconbackground"
-            app:itemIconTint="@drawable/iconbackground"
             android:background="@drawable/bottom_design"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:itemIconTint="@drawable/iconbackground"
+            app:itemTextColor="@drawable/iconbackground"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/menu_bar">
 
         </com.google.android.material.bottomnavigation.BottomNavigationView>
 

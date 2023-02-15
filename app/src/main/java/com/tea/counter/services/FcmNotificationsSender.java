@@ -20,27 +20,23 @@ import java.util.Map;
 public class FcmNotificationsSender {
 
     private final String postUrl = "https://fcm.googleapis.com/fcm/send";
-    private final String fcmServerKey = "AAAA0_uscv0:APA91bEceFXoo9lKBzaLPV13uxWQ4FwAQTWHh6BczGk_iYeM3RtKisoTSzhkj3tcX4OaXli1xxf-1i9esYMsanIXSS_Qn5g-X5vnq8kOMMwr3DQ19L6XQsDzTIhWyVgYMPEiWifLEHUy";
+    private final String FCM_SERVER_KEY = "AAAA0_uscv0:APA91bEceFXoo9lKBzaLPV13uxWQ4FwAQTWHh6BczGk_iYeM3RtKisoTSzhkj3tcX4OaXli1xxf-1i9esYMsanIXSS_Qn5g-X5vnq8kOMMwr3DQ19L6XQsDzTIhWyVgYMPEiWifLEHUy";
     String userFcmToken;
     String title;
     String body;
     Context mContext;
-    Activity mActivity;
     private RequestQueue requestQueue;
 
-    public FcmNotificationsSender(String userFcmToken, String title, String body, Context mContext, Activity mActivity) {
+    public FcmNotificationsSender(String userFcmToken, String title, String body, Context mContext) {
         this.userFcmToken = userFcmToken;
         this.title = title;
         this.body = body;
         this.mContext = mContext;
-        this.mActivity = mActivity;
-
-
     }
 
     public void SendNotifications() {
 
-        requestQueue = Volley.newRequestQueue(mActivity);
+        requestQueue = Volley.newRequestQueue(mContext);
         JSONObject mainObj = new JSONObject();
         try {
             mainObj.put("to", userFcmToken);
@@ -48,8 +44,6 @@ public class FcmNotificationsSender {
             notiObject.put("title", title);
             notiObject.put("body", body);
             notiObject.put("icon", "icon"); // enter icon that exists in drawable only
-
-
             mainObj.put("notification", notiObject);
 
 
@@ -69,23 +63,16 @@ public class FcmNotificationsSender {
             }) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
-
-
                     Map<String, String> header = new HashMap<>();
                     header.put("content-type", "application/json");
-                    header.put("authorization", "key=" + fcmServerKey);
+                    header.put("authorization", "key=" + FCM_SERVER_KEY);
                     return header;
-
-
                 }
             };
             requestQueue.add(request);
 
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 }

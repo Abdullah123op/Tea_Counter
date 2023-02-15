@@ -5,6 +5,7 @@ public class Constants {
 
     //For FireStore Data Save & Get Database
     public static final String COLLECTION_NAME = "user";
+    public static final String COLLECTION_NAME_ORDERS = "orders";
     public static final String UID = "uid";
     public static final String MOBILE_NUMBER = "mobileNumber";
     public static final String USER_TYPE = "userType";
@@ -32,6 +33,37 @@ public class Constants {
     public static final String ITEM_NAME = "itemName";
     public static final String ITEM_PRICE = "price";
 
+
+    //TODO ORDER DATABASE
+    public static final String ORDER_ITEM_LIST = "orderItemList";
+    public static final String TOTAL_AMOUNT = "totalAmount";
+    public static final String SELLER_NAME_ORDER = "sellerName";
+    public static final String SELLER_IMAGE_ORDER = "sellerImage";
+    public static final String SELLER_UID_ORDER = "sellerUID";
+    public static final String TIMESTAMP_ORDER = "timeStamp";
+    public static final String TIME_ORDER = "time";
+    public static final String DATE_ORDER = "date";
+    public static final String CUSTOMER_NAME = "customerName";
+    public static final String CUSTOMER_UID = "customerUid";
+    public static final String CUSTOMER_IMAGE = "customerImage";
+
+
+
+    //TODO BILL DATABASE
+    public static final String COLLECTION_NAME_BILL = "bills";
+    public static final String TOTAL_QTY_BILL = "totalQtyBill";
+    public static final String TOTAL_AMOUNT_SUM_BILL = "totalAmountSumBill";
+    public static final String CUSTOMER_NAME_BILL = "customerNameBill";
+    public static final String SELLER_NAME_BILL = "sellerNameBill";
+    public static final String CUSTOMER_UID_BILL = "customerUidBill";
+    public static final String SELLER_UID_BILL = "sellerUidBill";
+    public static final String IS_PAID_BILL = "isPaid";
+    public static final String BILL_MONTH = "billMonth";
+    public static final String CUSTOMER_UID_MAIN_BILL = "customerUidMainBill";
+
+
+    //TODO MESSAGES
+    public static final String LOGOUT_CONFIRMATION_MESSAGE = "Are you Sure? You Want To LogOut";
 
 
 }

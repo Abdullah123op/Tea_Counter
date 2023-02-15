@@ -33,10 +33,8 @@ import java.util.Objects;
 
 public class SItemsFragment extends Fragment {
     FragmentSItemsBinding binding;
-
     ArrayList<ItemModel> myArrayList = new ArrayList<>();
     ItemAdapter adapter;
-
     ItemModel itemModel;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Context mContext;
@@ -62,7 +60,7 @@ public class SItemsFragment extends Fragment {
             public void onClick(View v) {
                 binding.btnAddItemSubmit.setVisibility(View.GONE);
                 binding.progressBar.setVisibility(View.VISIBLE);
-                if (!binding.etItemName.getText().toString().isEmpty() && !binding.etPrice.getText().toString().isEmpty()) {
+                if (!Objects.requireNonNull(binding.etItemName.getText()).toString().isEmpty() && !Objects.requireNonNull(binding.etPrice.getText()).toString().isEmpty()) {
                     addArrayListdb();
                     getArrayList();
 
@@ -80,7 +78,7 @@ public class SItemsFragment extends Fragment {
 
 
     public void addArrayListdb() {
-        itemModel = new ItemModel(myArrayList.size() + 1, binding.etItemName.getText().toString(), binding.etPrice.getText().toString());
+        itemModel = new ItemModel(myArrayList.size() + 1, Objects.requireNonNull(binding.etItemName.getText()).toString(), Objects.requireNonNull(binding.etPrice.getText()).toString());
         myArrayList.add(itemModel);
 
         for (ItemModel item : myArrayList) {
@@ -125,24 +123,31 @@ public class SItemsFragment extends Fragment {
                         }
 
                     }
-                    adapter = new ItemAdapter(myArrayList, new ItemAdapter.ItemClick() {
-                        @Override
-                        public void onClick(int position) {
+                    if (myArrayList.isEmpty()) {
+                        binding.itemRecyclerView.setVisibility(View.GONE);
+                        binding.itemRecyclerViewAlt.setVisibility(View.VISIBLE);
+                    } else {
+                        adapter = new ItemAdapter(myArrayList, new ItemAdapter.ItemClick() {
+                            @Override
+                            public void onClick(int position) {
 
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                            builder.setMessage("Are you sure you want to delete this item?").setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    deleteArrayListdb(position);
-                                }
-                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                            AlertDialog alert = builder.create();
-                            alert.show();
-                        }
-                    });
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setMessage("Are you sure you want to delete this item?").setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        deleteArrayListdb(position);
+                                    }
+                                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
+                        });
+                        binding.itemRecyclerView.setVisibility(View.VISIBLE);
+                        binding.itemRecyclerViewAlt.setVisibility(View.GONE);
+                    }
                     binding.itemRecyclerView.setAdapter(adapter);
                     binding.btnAddItemSubmit.setVisibility(View.VISIBLE);
                     binding.progressBar.setVisibility(View.GONE);

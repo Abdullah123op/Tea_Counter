@@ -17,8 +17,6 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.tea.counter.R;
 import com.tea.counter.databinding.ActivityCustomerBinding;
@@ -30,11 +28,10 @@ import com.tea.counter.ui.Customerfragments.CProfileFragment;
 import com.tea.counter.utils.Constants;
 import com.tea.counter.utils.Preference;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomerActivity extends AppCompatActivity implements RequestDialog.ExampleDialogListener {
+public class CustomerActivity extends AppCompatActivity {
     ActivityCustomerBinding binding;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -94,19 +91,36 @@ public class CustomerActivity extends AppCompatActivity implements RequestDialog
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             String currentToken = document.getString(Constants.FCM_TOKEN);
-                            // Compare the current token with the firebaseToken
-                            if (!currentToken.equals(firebaseToken)) {
-                                // Update the database with the new firebaseToken
+                            if (currentToken != null) {
+                                // Compare the current token with the firebaseToken
+                                if (!currentToken.equals(firebaseToken)) {
+                                    // Update the database with the new firebaseToken
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put(Constants.FCM_TOKEN, firebaseToken);
+                                    db.collection(Constants.COLLECTION_NAME).document(documentName).update(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Preference.setFcmToken(CustomerActivity.this, firebaseToken);
+                                                Log.d("Token", "Token updated in the database");
+                                            } else {
+                                                Log.e("Token", "Failed to update the token in the database", task.getException());
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                // If the current token is null, add the firebaseToken to the database
                                 Map<String, Object> data = new HashMap<>();
                                 data.put(Constants.FCM_TOKEN, firebaseToken);
                                 db.collection(Constants.COLLECTION_NAME).document(documentName).update(data).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Log.d("Token", "Token updated in the database");
                                             Preference.setFcmToken(CustomerActivity.this, firebaseToken);
+                                            Log.d("Token", "Token added to the database");
                                         } else {
-                                            Log.e("Token", "Failed to update the token in the database", task.getException());
+                                            Log.e("Token", "Failed to add the token to the database", task.getException());
                                         }
                                     }
                                 });
@@ -119,27 +133,6 @@ public class CustomerActivity extends AppCompatActivity implements RequestDialog
 
     }
 
-    //for future use
-    public void retriveSeller() {
-
-        ArrayList<Object> arrayList = new ArrayList<>();
-
-        db.collection(Constants.COLLECTION_NAME).whereEqualTo(Constants.USER_TYPE, "0").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.d("USERNAME", document.getString(Constants.USER_NAME));
-                        arrayList.add(document.getString(Constants.USER_NAME));
-                    }
-                } else {
-                    Log.d("ERR", "Error getting documents: ", task.getException());
-                }
-            }
-        });
-
-    }
-
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -148,8 +141,4 @@ public class CustomerActivity extends AppCompatActivity implements RequestDialog
     }
 
 
-    @Override
-    public void applyTexts(String mobileNo) {
-
-    }
 }

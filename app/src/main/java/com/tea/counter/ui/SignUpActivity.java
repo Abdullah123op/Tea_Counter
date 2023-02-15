@@ -77,12 +77,16 @@ public class SignUpActivity extends AppCompatActivity {
                 Log.e("Token Fail", "Fetching FCM registration token failed", task.getException());
                 return;
             }
-            // Get new FCM registration token
-            firebaseToken = task.getResult();
-            signupModel.setFcmToken(firebaseToken);
+            //did changes here take a look
+            if (task.isSuccessful()) {
+                // Get new FCM registration token
+                firebaseToken = task.getResult();
+                signupModel.setFcmToken(firebaseToken);
 
-            // Log and toast
-            Log.d("Token ", firebaseToken);
+                // Log and toast
+                Log.d("Token ", firebaseToken);
+            }
+
         });
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -106,6 +110,7 @@ public class SignUpActivity extends AppCompatActivity {
                             case 1:
                                 // Code for taking a photo with the camera goes here
                                 Intent iGallery = new Intent(Intent.ACTION_PICK);
+                                iGallery.setType("image/*");
                                 iGallery.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                                 startActivityForResult(iGallery, GALLERY_REQ_CODE);
                                 break;

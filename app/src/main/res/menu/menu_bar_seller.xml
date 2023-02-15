@@ -10,9 +10,9 @@
         android:icon="@drawable/baseline_shopping_cart_24"
         android:title="Orders" />
     <item
-        android:id="@+id/sellerItems"
-        android:icon="@drawable/baseline_book_24"
-        android:title="Items" />
+        android:id="@+id/confirmOrder"
+        android:icon="@drawable/twotone_add_circle_outline_24"
+        android:title="Confirm Orders" />
     <item
         android:id="@+id/sellerBill"
         android:icon="@drawable/bill"

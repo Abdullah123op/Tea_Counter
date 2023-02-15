@@ -47,9 +47,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/_12sdp"
                     android:drawableLeft="@drawable/baseline_edit_24"
                     android:foregroundGravity="center"
-                    android:layout_marginBottom="@dimen/_12sdp"
                     android:gravity="center"
                     android:text="  Edit"
                     android:textColor="@color/white"
@@ -61,9 +61,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/_12sdp"
                     android:drawableLeft="@drawable/ic_true"
                     android:foregroundGravity="center"
-                    android:layout_marginBottom="@dimen/_12sdp"
                     android:gravity="center"
                     android:text="  Save"
                     android:textColor="@color/white"
@@ -126,13 +126,15 @@
                         android:textSize="@dimen/_11sdp"
                         android:textStyle="bold" />
 
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <TextView
                         android:id="@+id/etSeditNumber"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
                         android:background="@null"
                         android:enabled="false"
+                        android:maxLength="10"
+                        android:inputType="phone"
                         android:paddingStart="@dimen/_10sdp"
                         android:text="1213541214"
                         android:textColor="@color/white"

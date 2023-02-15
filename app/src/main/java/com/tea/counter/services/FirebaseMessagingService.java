@@ -48,7 +48,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL_ID");
-        builder.setSmallIcon(R.drawable.baseline_home_24);
+        builder.setSmallIcon(R.drawable.baseline_notifications_active_24);
 //        builder.setSmallIcon(resourceImage);
 
 

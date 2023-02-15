@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,7 @@ import com.tea.counter.model.ItemModel;
 import com.tea.counter.model.SignupModel;
 import com.tea.counter.services.FcmNotificationsSender;
 import com.tea.counter.utils.Constants;
+import com.tea.counter.utils.Preference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,11 +41,9 @@ public class RequestDialog extends AppCompatDialogFragment {
     DialogRequestBinding binding;
     String fcmToken;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    String message = "";
-
     ArrayList<String> messageArraylist = new ArrayList<>();
-    private ExampleDialogListener listener;
     private Context mContext;
+
 
     @NonNull
     @Override
@@ -59,7 +59,6 @@ public class RequestDialog extends AppCompatDialogFragment {
         getDialog().setCancelable(false);
         retriveSeller();
         initView();
-        // msgSend();
 
         return binding.getRoot();
     }
@@ -70,7 +69,8 @@ public class RequestDialog extends AppCompatDialogFragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    ArrayList<SignupModel> arrayList = new ArrayList<>();
+                    ArrayList<SignupModel> sellersArrayList = new ArrayList<>();
+
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         SignupModel signupModel = new SignupModel();
                         signupModel.setUid((String) document.getData().get(Constants.UID));
@@ -83,43 +83,53 @@ public class RequestDialog extends AppCompatDialogFragment {
                         signupModel.setLongitude((String) document.getData().get(Constants.LONGITUDE));
                         signupModel.setImageURL((String) document.getData().get(Constants.IMAGE));
                         signupModel.setFcmToken((String) document.getData().get(Constants.FCM_TOKEN));
-                        fcmToken = signupModel.getFcmToken();
+                        //fcmToken = signupModel.getFcmToken();
+
+                        //there is arraylist in the arrayList which type is hashmap
                         signupModel.setMyArrayList((ArrayList<HashMap<String, Object>>) document.getData().get(Constants.ITEM_ARRAY_LIST));
-                        arrayList.add(signupModel);
+                        sellersArrayList.add(signupModel);
                     }
 
-                    SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, arrayList);
+                    SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, sellersArrayList);
                     binding.spinnerSeller.setAdapter(spinnerAdapter);
                     binding.spinnerSeller.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            Log.e("11111 : ", new Gson().toJson(arrayList.get(position).getMyArrayList()));
+                            fcmToken = (sellersArrayList.get(position).getFcmToken());
+                            Log.e("11111 : ", new Gson().toJson(sellersArrayList.get(position).getUserName()));
+
                             ArrayList<ItemModel> myArrayList = new ArrayList<>();
-                            ArrayList<HashMap<String, Object>> list = arrayList.get(position).getMyArrayList();
+                            if (sellersArrayList.get(position).getMyArrayList() != null) {
+                                ArrayList<HashMap<String, Object>> list = sellersArrayList.get(position).getMyArrayList();
 
-                            for (int i = 0; i < list.size(); i++) {
-                                HashMap<String, Object> item = list.get(i);
-                                int itemId = Integer.parseInt(String.valueOf(item.get(Constants.ITEM_ID)));
-                                String itemName = (String) item.get(Constants.ITEM_NAME);
-                                String itemPrice = (String) item.get(Constants.ITEM_PRICE);
+                                for (int i = 0; i < list.size(); i++) {
+                                    HashMap<String, Object> itemList = list.get(i);
+                                    int itemId = Integer.parseInt(String.valueOf(itemList.get(Constants.ITEM_ID)));
+                                    String itemName = (String) itemList.get(Constants.ITEM_NAME);
+                                    String itemPrice = (String) itemList.get(Constants.ITEM_PRICE);
 
-                                ItemModel itemModel = new ItemModel(itemId, itemName, itemPrice);
-                                myArrayList.add(itemModel);
-                                for (ItemModel item2 : myArrayList) {
-                                    Log.d("ArrayList Contents", "Id: " + item2.getId() + " Name: " + item2.getItemName() + " Price: " + item2.getPrice());
+                                    ItemModel itemModel = new ItemModel(itemId, itemName, itemPrice);
+                                    myArrayList.add(itemModel);
+                                    for (ItemModel item2 : myArrayList) {
+                                        Log.d("ArrayList Contents", "Id: " + item2.getId() + " Name: " + item2.getItemName() + " Price: " + item2.getPrice());
+                                    }
                                 }
+                            } else {
+                                Toast.makeText(mContext, "This Seller Has Not Any Item", Toast.LENGTH_SHORT).show();
                             }
+
+
                             ItemInCustomerAdapter adapter = new ItemInCustomerAdapter(myArrayList, new ItemInCustomerAdapter.ItemClick() {
 
                                 @Override
                                 public void onClick(ArrayList<ItemModel> dataList) {
                                     Log.e("11111 : ", new Gson().toJson(dataList));
+                                    messageArraylist.clear();
                                     for (ItemModel dataItem : dataList) {
                                         if (dataItem.getClick()) {
                                             messageArraylist.add(dataItem.getItemName());
                                         }
                                     }
-
                                 }
                             });
                             binding.recyclerViewCustomerRequest.setAdapter(adapter);
@@ -127,9 +137,12 @@ public class RequestDialog extends AppCompatDialogFragment {
 
                         @Override
                         public void onNothingSelected(AdapterView<?> parent) {
-
                         }
                     });
+                }
+                if (task.getResult().isEmpty()) {
+                    Toast.makeText(mContext, "There is no Seller In Database", Toast.LENGTH_SHORT).show();
+                    dismiss();
                 } else {
                     Log.d("ERR", "Error getting documents: ", task.getException());
                 }
@@ -141,33 +154,29 @@ public class RequestDialog extends AppCompatDialogFragment {
         binding.btnRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("3333 ", "" + messageArraylist);
-                //  msgSend(message);
+                if (!messageArraylist.isEmpty()) {
+                    String message = messageArraylist.toString().replace(",", " and").replace("[", "").replace("]", "");
+                    Log.d("1111 :  ", message);
+                    msgSend(Preference.getName(mContext) + " Wants " + message);
+                } else {
+                    Toast.makeText(mContext, "Please select at list one item.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         binding.btnCancelInRequestDialog.setOnClickListener(v -> dismiss());
     }
 
     private void msgSend(String message) {
-        FcmNotificationsSender notificationsSender = new FcmNotificationsSender(fcmToken, "New Tea Order", message, mContext, getActivity());
+        FcmNotificationsSender notificationsSender = new FcmNotificationsSender(fcmToken, "New Order", message, mContext);
         notificationsSender.SendNotifications();
+        Toast.makeText(mContext, "Order Placed", Toast.LENGTH_SHORT).show();
+        dismiss();
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
-        try {
-            listener = (ExampleDialogListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context + "must implement ExampleDialogListener");
-        }
     }
-
-
-    public interface ExampleDialogListener {
-        void applyTexts(String mobileNo);
-    }
-
 }
 

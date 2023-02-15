@@ -44,6 +44,7 @@
                 android:id="@+id/recyclerViewCustomerRequest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:layout_constraintHeight_max="300dp"
                 android:layout_marginStart="@dimen/_30sdp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="@dimen/_30sdp"

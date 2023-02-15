@@ -40,13 +40,6 @@
 
         </activity>
         <activity
-            android:name=".ui.HomeActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
             android:name=".ui.SignUpActivity"
             android:exported="true">
             <meta-data

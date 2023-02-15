@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/dialogboxBackGround"
+    android:orientation="horizontal">
+
+    <CheckBox
+        android:id="@+id/txtItemNameConfirmItem"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight=".8"
+        android:buttonTint="@color/white"
+        android:singleLine="true"
+        android:text="Tea "
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp" />
+
+    <TextView
+        android:id="@+id/txtItemPriceConfirmItem"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/_18sdp"
+        android:layout_weight=".2"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="₹150"
+        android:textSize="@dimen/_10sdp" />
+
+    <EditText
+        android:id="@+id/etQTY"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight=".3"
+        android:background="@android:color/transparent"
+        android:enabled="false"
+        android:gravity="center"
+        android:inputType="phone"
+        android:maxLength="2"
+        android:singleLine="true"
+        android:text="0" />
+
+    <TextView
+        android:id="@+id/txtTotalPrice"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_weight=".3"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="₹0"
+        android:textSize="@dimen/_10sdp" />
+
+</LinearLayout>
