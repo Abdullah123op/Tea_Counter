@@ -1,19 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="@color/dialogboxBackGround"
+    android:orientation="horizontal">
 
     <CheckBox
-        android:id="@+id/itemName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:background="@color/dialogboxBackGround"
+        android:id="@+id/txtItemNameReqItem"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight=".8"
         android:buttonTint="@color/white"
-        android:layoutDirection="rtl"
-        android:text="Item"
+        android:singleLine="true"
+        android:text="Tea "
         android:textColor="@color/white"
-        android:textSize="@dimen/_15sdp" />
+        android:textSize="@dimen/_12sdp" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+    <TextView
+        android:id="@+id/txtItemPriceReqItem"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/_18sdp"
+        android:layout_weight=".2"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="₹150"
+        android:textSize="@dimen/_10sdp" />
+
+    <EditText
+        android:id="@+id/etQTYReqItem"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight=".3"
+        android:background="@android:color/transparent"
+        android:enabled="false"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLength="2"
+        android:singleLine="true"
+        android:hint="0"
+        android:textColorHint="#756F6F"
+
+        />
+
+    <TextView
+        android:id="@+id/txtReqTotalPrice"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_weight=".3"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="₹0"
+        android:textSize="@dimen/_10sdp" />
+
+</LinearLayout>

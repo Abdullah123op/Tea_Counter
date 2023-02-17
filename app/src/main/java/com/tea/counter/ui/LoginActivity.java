@@ -2,6 +2,7 @@ package com.tea.counter.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -24,7 +25,7 @@ import com.tea.counter.utils.Constants;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class LoginActivity extends AppCompatActivity implements OtpDialog.ExampleDialogListener {
+public class LoginActivity extends AppCompatActivity {
 
     ActivityLoginBinding binding;
     FirebaseAuth firebaseAuth;
@@ -42,23 +43,25 @@ public class LoginActivity extends AppCompatActivity implements OtpDialog.Exampl
         binding.btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                binding.btnSubmit.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnSubmit.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
+
                 if (binding.etMobileNumber.getText().toString().trim().isEmpty()) {
                     binding.etMobileNumber.setError(getString(R.string.empty_mb_number));
                 } else if (binding.etMobileNumber.getText().toString().trim().length() != 10) {
                     binding.etMobileNumber.setError(getString(R.string.invalid_mb_number));
                 } else {
                     otpSendMethod();
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(binding.mainLayout.getWindowToken(), 0);
                 }
             }
         });
-    }
-
-
-    @Override
-    public void applyTexts(String mobileNo) {
-        //  binding.testOtp.setText(mobileNo);
     }
 
     private void otpSendMethod() {
@@ -91,14 +94,9 @@ public class LoginActivity extends AppCompatActivity implements OtpDialog.Exampl
                 Toast.makeText(LoginActivity.this, getString(R.string.otp_sent_msg), Toast.LENGTH_SHORT).show();
             }
         };
-        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(firebaseAuth)
-                .setPhoneNumber("+91" + Objects.requireNonNull(binding.etMobileNumber.getText()).toString().trim())
-                .setTimeout(60L, TimeUnit.SECONDS)
-                .setActivity(LoginActivity.this).setCallbacks(mCallback)
-                .build();
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(firebaseAuth).setPhoneNumber("+91" + Objects.requireNonNull(binding.etMobileNumber.getText()).toString().trim()).setTimeout(60L, TimeUnit.SECONDS).setActivity(LoginActivity.this).setCallbacks(mCallback).build();
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
-
 //    public void openDialog() {
 //        OtpDialog otpDialog = new OtpDialog();
 //        Bundle bundle = new Bundle();

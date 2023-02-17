@@ -4,7 +4,7 @@ public class ItemModel {
     private int id;
     private String itemName;
     private String price;
-    private String qty = "0";
+    private String qty = "";
     private Boolean isClick = false;
     private String totalPrice = "0";
 

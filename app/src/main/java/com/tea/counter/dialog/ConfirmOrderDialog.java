@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -180,6 +181,13 @@ public class ConfirmOrderDialog extends AppCompatDialogFragment {
         binding.btnPlace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                binding.btnPlace.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnPlace.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
 
                 long currentTime = System.currentTimeMillis();
                 Date date = new Date(currentTime);
@@ -192,7 +200,7 @@ public class ConfirmOrderDialog extends AppCompatDialogFragment {
 
                 boolean atLeastOneItemValid = false;
                 for (ItemModel item : orderedItemList) {
-                    if (item.getClick() && item.getQty().equals("0")) {
+                    if (item.getClick() &&  item.getQty().equals("") ||item.getQty().equals("0") || item.getQty().equals("00") || item.getQty().equals("000") || item.getQty().equals("0000")) {
                         atLeastOneItemValid = true;
                         break;
                     }
@@ -226,7 +234,10 @@ public class ConfirmOrderDialog extends AppCompatDialogFragment {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            dismiss();
+                            Toast.makeText(mContext, "Something Went Wrong", Toast.LENGTH_SHORT).show();
                         }
+
                     });
                 }
 
@@ -235,7 +246,7 @@ public class ConfirmOrderDialog extends AppCompatDialogFragment {
     }
 
     private void msgSend(String message) {
-        FcmNotificationsSender notificationsSender = new FcmNotificationsSender(customerArrayList.get(itemPosition).getFcmToken(), "New Order", message, mContext);
+        FcmNotificationsSender notificationsSender = new FcmNotificationsSender(customerArrayList.get(itemPosition).getFcmToken(), "New Order", message, Preference.getImgUri(mContext), mContext);
         notificationsSender.SendNotifications();
         Toast.makeText(mContext, "Message Sent", Toast.LENGTH_SHORT).show();
         dismiss();

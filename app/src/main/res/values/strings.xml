@@ -29,7 +29,8 @@
     <string name="permission_require_error">Required Permission</string>
 
     <!--    database error-->
-    <string name="saved_database_success_msg">Saved In Database</string>
+    <string name="saved_database_success_msg">Registration Successful</string>
+    <string name="update_image_message">Image Updated Successfully</string>
     <string name="failed_database_msg">Failed To Save</string>
 
     <!--    city error-->
@@ -67,23 +68,9 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_seller">SellerActivity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-
-    <string-array name="numbers">
-        <item>Ramesh Bhai 1 </item>
-        <item>Ramesh Bhai 2 </item>
-        <item>Ramesh Bhai 3 </item>
-        <item>Ramesh Bhai 4 </item>
-
-    </string-array>
     <string name="title_activity_main">MainActivity</string>
+    <string name="resend_timer_text">Resend in %d seconds</string>
+
 
 </resources>

@@ -1,5 +1,7 @@
 package com.tea.counter.adapter;
 
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -20,10 +23,15 @@ import java.util.List;
 public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.ViewHolder> {
     List<OrderModel> dataList;
     boolean isHomePage;
+    boolean isSellerSide;
 
-    public ExpandableAdapter(ArrayList<OrderModel> dataList, boolean isHomePage) {
+    boolean isNotificationSide;
+
+    public ExpandableAdapter(ArrayList<OrderModel> dataList, boolean isHomePage, boolean isSellerSide, boolean isNotificationSide) {
         this.dataList = dataList;
         this.isHomePage = isHomePage;
+        this.isSellerSide = isSellerSide;
+        this.isNotificationSide = isNotificationSide;
     }
 
     @NonNull
@@ -38,7 +46,34 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
     public void onBindViewHolder(@NonNull ExpandableAdapter.ViewHolder holder, int position) {
         OrderModel model = dataList.get(position);
 
-        holder.txtTitleExpandable.setText(String.valueOf(model.getOrderTitle()));
+        if (isNotificationSide) {
+            Drawable myDrawable = ContextCompat.getDrawable(holder.imgUserAdapter.getContext(), R.drawable.new_order);
+            holder.imgUserAdapter.setImageDrawable(myDrawable);
+            holder.txtPriceExpandable.setVisibility(View.GONE);
+            if (model.getAdditionalComment() != null) {
+                holder.txtAdditional.setVisibility(View.VISIBLE);
+                holder.txtAdditional.setText("Message : " + model.getAdditionalComment());
+            } else if (model.getAdditionalComment() == null) {
+                holder.txtAdditional.setVisibility(View.GONE);
+            }
+            //  holder.txtAdditional.setVisibility(View.GONE);
+            Log.d("45454", "" + model.getAdditionalComment());
+
+            holder.txtTitleExpandable.setText(" New Order from  " + model.getOrderTitle());
+            holder.orderItemDetails.setText(model.getOrderDetails());
+            holder.txtTimeExpandable.setText(model.getOrderTime());
+
+            boolean isVisible = dataList.get(position).isVisibility();
+            holder.constraintLayoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+            return;
+        }
+
+        if (isSellerSide) {
+            holder.txtTitleExpandable.setText("Delivered To " + model.getOrderTitle());
+        } else {
+            holder.txtTitleExpandable.setText("Delivered from " + model.getOrderTitle());
+        }
+
         if (isHomePage) {
             holder.txtTimeExpandable.setText(model.getOrderTime());
         } else {
@@ -65,6 +100,7 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
         TextView txtTimeExpandable;
         TextView txtPriceExpandable;
         TextView orderItemDetails;
+        TextView txtAdditional;
         ConstraintLayout constraintLayoutExpand;
         ConstraintLayout mainLayoutExpandable;
         ImageView imgUserAdapter;
@@ -78,6 +114,7 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
             constraintLayoutExpand = itemView.findViewById(R.id.constraintLayoutExpand);
             mainLayoutExpandable = itemView.findViewById(R.id.mainLayoutExpandable);
             imgUserAdapter = itemView.findViewById(R.id.imgUserAdapter);
+            txtAdditional = itemView.findViewById(R.id.txtAdditional);
 
 
             mainLayoutExpandable.setOnClickListener(new View.OnClickListener() {

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -48,8 +51,15 @@ public class OtpDialog extends AppCompatDialogFragment {
     String mainOTP;
     String phoneNumber;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ExampleDialogListener listener;
     private Context mContext;
+    private int resendCount = 0;
+    private CountDownTimer resendTimer;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 
     @NonNull
     @Override
@@ -68,6 +78,7 @@ public class OtpDialog extends AppCompatDialogFragment {
     }
 
     private void initView() {
+        setResendCount();
         Bundle bundle = getArguments();
         if (bundle != null) {
             phoneNumber = bundle.getString(Constants.BUNDLE_MB_NO);
@@ -78,6 +89,13 @@ public class OtpDialog extends AppCompatDialogFragment {
             binding.btnSubmitInDialog1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    binding.btnSubmitInDialog1.setEnabled(false); // disable the button
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            binding.btnSubmitInDialog1.setEnabled(true); // enable the button after 1 second
+                        }
+                    }, 2000);
                     if (binding.etC1.getText().toString().trim().isEmpty() || binding.etC2.getText().toString().trim().isEmpty() || binding.etC3.getText().toString().trim().isEmpty() || binding.etC4.getText().toString().trim().isEmpty() || binding.etC5.getText().toString().trim().isEmpty() || binding.etC6.getText().toString().trim().isEmpty()) {
                         Toast.makeText(mContext, getString(R.string.otp_empty_error), Toast.LENGTH_SHORT).show();
                         binding.etC1.setBackgroundResource(R.drawable.otp_box_error);
@@ -87,6 +105,9 @@ public class OtpDialog extends AppCompatDialogFragment {
                         binding.etC5.setBackgroundResource(R.drawable.otp_box_error);
                         binding.etC6.setBackgroundResource(R.drawable.otp_box_error);
                     } else {
+                        binding.txtResend.setVisibility(View.GONE);
+                        binding.resendTimer.setVisibility(View.GONE);
+                        resendTimer.cancel();
                         otpVerifyMethod();
                         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(requireView().getWindowToken(), 0);
@@ -95,10 +116,10 @@ public class OtpDialog extends AppCompatDialogFragment {
 
 
             });
+
             binding.txtResend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    binding.txtResend.setBackgroundResource(R.color.black);
                     PhoneAuthProvider.getInstance().verifyPhoneNumber("+91 " + phoneNumber,        // Phone number to verify
                             60,                 // Timeout duration
                             TimeUnit.SECONDS,   // Unit of timeout
@@ -120,16 +141,44 @@ public class OtpDialog extends AppCompatDialogFragment {
                                     mainOTP = verificationId;
                                     Toast.makeText(mContext, getString(R.string.Otp_resent), Toast.LENGTH_SHORT).show();
                                     Log.e("onCodeSent", "Code Has been Sent");
+                                    setResendCount();
                                 }
                             });
                 }
             });
 
-            binding.btnCancel.setOnClickListener(v -> dismiss());
+
+            binding.btnCancel.setOnClickListener(v -> {
+                dismiss();
+                resendTimer.cancel();
+            });
 
         }
 
 
+    }
+
+    public void setResendCount() {
+        resendCount = 60;
+        resendCount--;
+        resendTimer = new CountDownTimer(60000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                resendCount--;
+                // Update UI to show remaining time
+                binding.resendTimer.setVisibility(View.VISIBLE);
+                binding.resendTimer.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
+                binding.txtResend.setVisibility(View.GONE);
+                binding.resendTimer.setText(getString(R.string.resend_timer_text, resendCount));
+            }
+
+            public void onFinish() {
+                // Enable the "resend" button
+                // e.g. set a boolean flag to true
+                binding.resendTimer.setVisibility(View.GONE);
+                binding.txtResend.setVisibility(View.VISIBLE);
+            }
+        }.start();
     }
 
     private void otpVerifyMethod() {
@@ -169,7 +218,6 @@ public class OtpDialog extends AppCompatDialogFragment {
     }
 
     public void CheckDatabase() {
-
         db.collection(Constants.COLLECTION_NAME).whereEqualTo(Constants.MOBILE_NUMBER, phoneNumber).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -187,9 +235,6 @@ public class OtpDialog extends AppCompatDialogFragment {
                         String documentId = document.getId();
                         Log.d("TAG", "Document ID: " + documentId);
                         retriveDatabase();
-
-
-                        dismiss();
                     }
                 }
 
@@ -238,11 +283,12 @@ public class OtpDialog extends AppCompatDialogFragment {
                                 if (Preference.getUserType(mContext).equals("0")) {
                                     mContext.startActivity(new Intent(mContext, SellerActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                                     Toast.makeText(mContext, "Logged In As Seller", Toast.LENGTH_SHORT).show();
+                                    dismiss();
                                 } else if (Preference.getUserType(mContext).equals("1")) {
                                     mContext.startActivity(new Intent(mContext, CustomerActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                                     Toast.makeText(mContext, "Logged In As Customer", Toast.LENGTH_SHORT).show();
+                                    dismiss();
                                 }
-
                             } else {
                                 Toast.makeText(mContext, "Something Went Wrong ", Toast.LENGTH_SHORT).show();
                             }
@@ -264,21 +310,6 @@ public class OtpDialog extends AppCompatDialogFragment {
         binding.etC4.addTextChangedListener(new GenericTextWatcher(binding.etC4, edit));
         binding.etC5.addTextChangedListener(new GenericTextWatcher(binding.etC5, edit));
         binding.etC6.addTextChangedListener(new GenericTextWatcher(binding.etC6, edit));
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
-        try {
-            listener = (ExampleDialogListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context + "must implement ExampleDialogListener");
-        }
-    }
-
-    public interface ExampleDialogListener {
-        void applyTexts(String mobileNo);
     }
 
 

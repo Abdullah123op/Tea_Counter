@@ -95,6 +95,8 @@
                         android:enabled="false"
                         android:paddingStart="@dimen/_10sdp"
                         android:text="Abdullah Shahikh"
+                        android:maxLength="40"
+                        android:maxLines="1"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_11sdp"
                         android:textStyle="bold" />
@@ -172,6 +174,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
                         android:background="@null"
+                        android:maxLength="61"
+                        android:maxLines="1"
+
                         android:enabled="false"
                         android:paddingStart="@dimen/_10sdp"
                         android:text="Ahemedabad"
@@ -214,6 +219,8 @@
                         android:background="@null"
                         android:enabled="false"
                         android:paddingStart="@dimen/_10sdp"
+                        android:maxLength="200"
+                        android:maxLines="8"
                         android:text="B 608 Titanium Heights, Corporate Road, Prahlad Nagar, Titanium Heights, behind Vodafone House, Makarba, Ahmedabad, Gujarat 380015, India"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_11sdp"

@@ -26,6 +26,7 @@ import com.tea.counter.R;
 import com.tea.counter.adapter.ExpandableAdapter;
 import com.tea.counter.adapter.SpinnerAdapter;
 import com.tea.counter.databinding.FragmentCOrderBinding;
+import com.tea.counter.dialog.CustomProgressDialog;
 import com.tea.counter.model.OrderModel;
 import com.tea.counter.model.SignupModel;
 import com.tea.counter.utils.Constants;
@@ -49,7 +50,13 @@ public class COrderFragment extends Fragment {
     int totalQty = 0;
     double totalAmountSum = 0;
     private Context mContext;
-
+    CustomProgressDialog customProgressDialog;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+        customProgressDialog = new CustomProgressDialog(mContext);
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +77,7 @@ public class COrderFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 TextView textView = (TextView) view;
                 textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.baseline_arrow_drop_down_24, 0);
-
                 Log.e("55555 : ", new Gson().toJson(customerArrayList.get(position).getUserName()));
-
                 itemPosition = position;
                 getOrders(position);
             }
@@ -86,6 +91,7 @@ public class COrderFragment extends Fragment {
     }
 
     public void retrieveSeller() {
+        customProgressDialog.show();
         db.collection(Constants.COLLECTION_NAME).whereEqualTo(Constants.USER_TYPE, "0").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -105,14 +111,24 @@ public class COrderFragment extends Fragment {
                         signupModel.setFcmToken((String) document.getData().get(Constants.FCM_TOKEN));
                         customerArrayList.add(signupModel);
                     }
-                    SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, customerArrayList);
-                    binding.spinnerCustomerOrder.setAdapter(spinnerAdapter);
 
+
+                    if (customerArrayList.isEmpty()) {
+                        binding.recyclerViewInCustomerOrder.setVisibility(View.GONE);
+                        binding.recyclerViewInCustomerOrderAlt.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.recyclerViewInCustomerOrder.setVisibility(View.VISIBLE);
+                        binding.recyclerViewInCustomerOrderAlt.setVisibility(View.GONE);
+                        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, customerArrayList);
+                        binding.spinnerCustomerOrder.setAdapter(spinnerAdapter);
+
+                    }
                     //
 
                 }
                 if (task.getResult().isEmpty()) {
                     Toast.makeText(mContext, "There is no Seller In Database", Toast.LENGTH_SHORT).show();
+                    customProgressDialog.dismiss();
                 } else {
                     Log.d("ERR", "Error getting documents: ", task.getException());
                 }
@@ -195,23 +211,18 @@ public class COrderFragment extends Fragment {
 
                         Collections.reverse(orderList);
                         binding.recyclerViewInCustomerOrder.setLayoutManager(new LinearLayoutManager(getContext()));
-                        ExpandableAdapter expandableAdapter = new ExpandableAdapter(orderList, false);
+                        ExpandableAdapter expandableAdapter = new ExpandableAdapter(orderList, false, false, false);
                         binding.recyclerViewInCustomerOrder.setAdapter(expandableAdapter);
-
-
                     }
-
+                    customProgressDialog.dismiss();
 
                 } else {
                     Log.d("ERR", "Error getting Orders: ", task.getException());
+
                 }
             }
         });
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
-    }
+
 }

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +59,13 @@ public class SItemsFragment extends Fragment {
         binding.btnAddItemSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                binding.btnAddItemSubmit.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnAddItemSubmit.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
                 binding.btnAddItemSubmit.setVisibility(View.GONE);
                 binding.progressBar.setVisibility(View.VISIBLE);
                 if (!Objects.requireNonNull(binding.etItemName.getText()).toString().isEmpty() && !Objects.requireNonNull(binding.etPrice.getText()).toString().isEmpty()) {

@@ -1,6 +1,5 @@
 package com.tea.counter.services;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.android.volley.AuthFailureError;
@@ -25,12 +24,14 @@ public class FcmNotificationsSender {
     String title;
     String body;
     Context mContext;
+    String imageUrl;
     private RequestQueue requestQueue;
 
-    public FcmNotificationsSender(String userFcmToken, String title, String body, Context mContext) {
+    public FcmNotificationsSender(String userFcmToken, String title, String body, String imageUrl, Context mContext) {
         this.userFcmToken = userFcmToken;
         this.title = title;
         this.body = body;
+        this.imageUrl = imageUrl;
         this.mContext = mContext;
     }
 
@@ -44,8 +45,19 @@ public class FcmNotificationsSender {
             notiObject.put("title", title);
             notiObject.put("body", body);
             notiObject.put("icon", "icon"); // enter icon that exists in drawable only
-            mainObj.put("notification", notiObject);
+            notiObject.put("image", imageUrl); // add image url here
 
+            // add style parameter to the notification payload
+            JSONObject style = new JSONObject();
+            style.put("type", "bigpicture");
+            style.put("bigPictureUrl", imageUrl);
+            style.put("bigPictureWidth", "256");
+            style.put("bigPictureHeight", "256");
+            style.put("contentTitle", title);
+            style.put("summaryText", body);
+            notiObject.put("style", style);
+
+            mainObj.put("notification", notiObject);
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, postUrl, mainObj, new Response.Listener<JSONObject>() {
                 @Override

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,12 +30,16 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tea.counter.R;
 import com.tea.counter.databinding.FragmentCProfileBinding;
+import com.tea.counter.dialog.CustomProgressDialog;
 import com.tea.counter.dialog.ImageViewerDialog;
 import com.tea.counter.ui.LoginActivity;
 import com.tea.counter.utils.Constants;
@@ -56,8 +61,15 @@ public class CProfileFragment extends Fragment {
     FirebaseStorage storage = FirebaseStorage.getInstance();
     FragmentCProfileBinding binding;
     Uri imageUri = null;
+    CustomProgressDialog progressDialog;
     private Context mContext;
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+        progressDialog = new CustomProgressDialog(mContext);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,6 +119,13 @@ public class CProfileFragment extends Fragment {
         binding.btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                binding.btnEdit.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnEdit.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
                 binding.btnEdit.setVisibility(View.GONE);
                 binding.btnSave.setVisibility(View.VISIBLE);
 
@@ -117,6 +136,7 @@ public class CProfileFragment extends Fragment {
 
                 InputMethodManager imm = ContextCompat.getSystemService(mContext, InputMethodManager.class);
                 binding.etEditName.requestFocus();
+                assert imm != null;
                 imm.showSoftInput(binding.etEditName, InputMethodManager.SHOW_IMPLICIT);
 
 
@@ -158,7 +178,13 @@ public class CProfileFragment extends Fragment {
         binding.btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                binding.btnSave.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnSave.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
                 String usernameInput = binding.etEditName.getText().toString().trim();
                 String userCityInput = binding.etEditCity.getText().toString().trim();
                 String userAddressInput = binding.etEditAddress.getText().toString().trim();
@@ -178,6 +204,10 @@ public class CProfileFragment extends Fragment {
                 } else if (imageUri != null) {
                     updateImg();
                 } else {
+                    Toast.makeText(mContext, "Updating..", Toast.LENGTH_SHORT).show();
+
+                    progressDialog.show();
+
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     String documentName = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     Map<String, Object> data = new HashMap<>();
@@ -196,9 +226,12 @@ public class CProfileFragment extends Fragment {
                                 if (imageUri != null) {
                                     updateImg();
                                 }
-                                Toast.makeText(mContext, "Updated SuccessFully", Toast.LENGTH_SHORT).show();
+                                updateOrdersTable();
+
                             } else {
                                 Log.e("Token", "Failed to update the Data in the database", task.getException());
+                                Toast.makeText(mContext, "Something Went Wrong ", Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
                             }
                         }
                     });
@@ -238,14 +271,8 @@ public class CProfileFragment extends Fragment {
     }
 
     private void updateImg() {
-        Dialog mProgressDialog = new Dialog(mContext, android.R.style.Theme_Black);
-        View view = LayoutInflater.from(mContext).inflate(R.layout.loader_layout, null);
-        mProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mProgressDialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
-
-        mProgressDialog.setContentView(view);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        progressDialog = new CustomProgressDialog(mContext);
+        progressDialog.show();
 
         Toast.makeText(mContext, "Profile Image Is Updating...", Toast.LENGTH_SHORT).show();
         final StorageReference storageReference = storage.getReference().child("profileImage").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()));
@@ -259,16 +286,16 @@ public class CProfileFragment extends Fragment {
                         db.collection(Constants.COLLECTION_NAME).document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update(Constants.IMAGE, String.valueOf(uri)).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(mContext, getString(R.string.saved_database_success_msg), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, getString(R.string.update_image_message), Toast.LENGTH_SHORT).show();
                                 Preference.setImgUri(mContext, String.valueOf(uri));
-                                mProgressDialog.dismiss();
+                                progressDialog.dismiss();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.w("TAG", "Error adding document", e);
                                 Toast.makeText(mContext, getText(R.string.failed_database_msg), Toast.LENGTH_SHORT).show();
-                                mProgressDialog.dismiss();
+                                progressDialog.dismiss();
                             }
                         });
                     }
@@ -276,7 +303,6 @@ public class CProfileFragment extends Fragment {
             }
         });
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -297,7 +323,6 @@ public class CProfileFragment extends Fragment {
 
     }
 
-
     private Uri getImageUri(Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 20, bytes);
@@ -305,6 +330,71 @@ public class CProfileFragment extends Fragment {
         return Uri.parse(path);
     }
 
+
+
+
+
+    public void updateOrdersTable() {
+        db.collection(Constants.COLLECTION_NAME_ORDERS).whereEqualTo(Constants.CUSTOMER_UID, FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            WriteBatch batch = db.batch();
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME_ORDERS).document(documentSnapshot.getId());
+                batch.update(documentReference, Constants.CUSTOMER_NAME, Preference.getName(mContext));
+            }
+            batch.commit().addOnSuccessListener(aVoid -> {
+                // update successful
+                updateBillsTable();
+            }).addOnFailureListener(e -> {
+                // update failed
+            });
+        }).addOnFailureListener(e -> {
+            // query failed
+            Toast.makeText(mContext, "Something Went Wrong ", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+        });
+
+    }
+
+    public void updateBillsTable() {
+        db.collection(Constants.COLLECTION_NAME_BILL).whereEqualTo(Constants.CUSTOMER_UID_MAIN_BILL, FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            WriteBatch batch = db.batch();
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME_BILL).document(documentSnapshot.getId());
+                batch.update(documentReference, Constants.CUSTOMER_NAME_BILL, Preference.getName(mContext));
+            }
+            batch.commit().addOnSuccessListener(aVoid -> {
+                // update successful
+                updateNotificationTable();
+            }).addOnFailureListener(e -> {
+                // update failed
+            });
+        }).addOnFailureListener(e -> {
+            // query failed
+            Toast.makeText(mContext, "Something Went Wrong ", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+        });
+    }
+
+    public void updateNotificationTable() {
+        db.collection(Constants.COLLECTION_NAME_NOTIFICATION).whereEqualTo(Constants.NOTI_CUSTOMER_UID, FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            WriteBatch batch = db.batch();
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME_NOTIFICATION).document(documentSnapshot.getId());
+                batch.update(documentReference, Constants.NOTI_CUSTOMER_NAME, Preference.getName(mContext));
+            }
+            batch.commit().addOnSuccessListener(aVoid -> {
+                // update successful
+                progressDialog.dismiss();
+                Toast.makeText(mContext, "Updated SuccessFully", Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> {
+                // update failed
+            });
+        }).addOnFailureListener(e -> {
+            // query failed
+            Toast.makeText(mContext, "Something Went Wrong ", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+        });
+    }
 
     private boolean validateInputs() {
         String usernameInput = binding.etEditName.getText().toString().trim();
@@ -330,7 +420,6 @@ public class CProfileFragment extends Fragment {
         return true;
     }
 
-
     public void Logout() {
         binding.btnLogoutProfile.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -351,11 +440,6 @@ public class CProfileFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
-    }
 
 
 }

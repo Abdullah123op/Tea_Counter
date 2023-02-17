@@ -3,19 +3,18 @@ package com.tea.counter.ui.Sellerfragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -29,12 +28,16 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tea.counter.R;
 import com.tea.counter.databinding.FragmentSProfileBinding;
+import com.tea.counter.dialog.CustomProgressDialog;
 import com.tea.counter.dialog.ImageViewerDialog;
 import com.tea.counter.ui.LoginActivity;
 import com.tea.counter.utils.Constants;
@@ -55,8 +58,15 @@ public class SProfileFragment extends Fragment {
     FirebaseStorage storage = FirebaseStorage.getInstance();
     FragmentSProfileBinding binding;
     Uri imageUri = null;
+    CustomProgressDialog progressDialog;
     private Context mContext;
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+        progressDialog = new CustomProgressDialog(mContext);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,6 +115,14 @@ public class SProfileFragment extends Fragment {
         binding.btnEditSeller.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                binding.btnEditSeller.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnEditSeller.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
+
 
                 binding.btnEditSeller.setVisibility(View.GONE);
                 binding.btnSaveSeller.setVisibility(View.VISIBLE);
@@ -160,6 +178,13 @@ public class SProfileFragment extends Fragment {
         binding.btnSaveSeller.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                binding.btnSaveSeller.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnSaveSeller.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
 
                 String usernameInput = binding.etSeditName.getText().toString().trim();
                 String userCityInput = binding.etSeditCity.getText().toString().trim();
@@ -180,6 +205,7 @@ public class SProfileFragment extends Fragment {
                 } else if (imageUri != null) {
                     updateImg();
                 } else {
+                    progressDialog.show();
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     String documentName = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     Map<String, Object> data = new HashMap<>();
@@ -198,9 +224,10 @@ public class SProfileFragment extends Fragment {
                                 if (imageUri != null) {
                                     updateImg();
                                 }
-                                Toast.makeText(mContext, "Updated SuccessFully", Toast.LENGTH_SHORT).show();
+                                updateOrdersTable();
                             } else {
                                 Log.e("Token", "Failed to update the Data in the database", task.getException());
+                                progressDialog.dismiss();
                             }
                         }
                     });
@@ -241,14 +268,8 @@ public class SProfileFragment extends Fragment {
 
 
     private void updateImg() {
-        Dialog mProgressDialog = new Dialog(mContext, android.R.style.Theme_Black);
-        View view = LayoutInflater.from(mContext).inflate(R.layout.loader_layout, null);
-        mProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mProgressDialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
 
-        mProgressDialog.setContentView(view);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        progressDialog.show();
 
         Toast.makeText(mContext, "Profile Image Is Updating...", Toast.LENGTH_SHORT).show();
         final StorageReference storageReference = storage.getReference().child("profileImage").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()));
@@ -262,16 +283,16 @@ public class SProfileFragment extends Fragment {
                         db.collection(Constants.COLLECTION_NAME).document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update(Constants.IMAGE, String.valueOf(uri)).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(mContext, getString(R.string.saved_database_success_msg), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, getString(R.string.update_image_message), Toast.LENGTH_SHORT).show();
                                 Preference.setImgUri(mContext, String.valueOf(uri));
-                                mProgressDialog.dismiss();
+                                progressDialog.dismiss();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.w("TAG", "Error adding document", e);
                                 Toast.makeText(mContext, getText(R.string.failed_database_msg), Toast.LENGTH_SHORT).show();
-                                mProgressDialog.dismiss();
+                                progressDialog.dismiss();
                             }
                         });
                     }
@@ -280,6 +301,41 @@ public class SProfileFragment extends Fragment {
         });
     }
 
+
+    public void updateOrdersTable() {
+        db.collection(Constants.COLLECTION_NAME_ORDERS).whereEqualTo(Constants.SELLER_UID_ORDER, FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            WriteBatch batch = db.batch();
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME_ORDERS).document(documentSnapshot.getId());
+                batch.update(documentReference, Constants.SELLER_NAME_ORDER, Preference.getName(mContext));
+            }
+            batch.commit().addOnSuccessListener(aVoid -> {
+                // update successful
+                updateBillsTable();
+            }).addOnFailureListener(e -> {
+                progressDialog.dismiss();
+            });
+        });
+
+    }
+
+    public void updateBillsTable() {
+        db.collection(Constants.COLLECTION_NAME_BILL).whereEqualTo(Constants.SELLER_UID_BILL, FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            WriteBatch batch = db.batch();
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                DocumentReference documentReference = db.collection(Constants.COLLECTION_NAME_BILL).document(documentSnapshot.getId());
+                batch.update(documentReference, Constants.SELLER_NAME_BILL, Preference.getName(mContext));
+            }
+            batch.commit().addOnSuccessListener(aVoid -> {
+                // update successful
+                Toast.makeText(mContext, "Updated SuccessFully", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+            }).addOnFailureListener(e -> {
+                progressDialog.dismiss();
+            });
+        });
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -335,7 +391,13 @@ public class SProfileFragment extends Fragment {
 
     public void Logout() {
         binding.btnLogoutSprofile.setOnClickListener(v -> {
-
+            binding.btnLogoutSprofile.setEnabled(false); // disable the button
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.btnLogoutSprofile.setEnabled(true); // enable the button after 1 second
+                }
+            }, 2000);
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setMessage(Constants.LOGOUT_CONFIRMATION_MESSAGE).setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -355,10 +417,4 @@ public class SProfileFragment extends Fragment {
     }
 
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
-
-    }
 }

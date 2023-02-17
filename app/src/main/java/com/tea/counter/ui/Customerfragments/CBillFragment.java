@@ -24,6 +24,7 @@ import com.tea.counter.R;
 import com.tea.counter.adapter.BillAdapter;
 import com.tea.counter.adapter.SpinnerAdapter;
 import com.tea.counter.databinding.FragmentCBillBinding;
+import com.tea.counter.dialog.CustomProgressDialog;
 import com.tea.counter.model.BillModel;
 import com.tea.counter.model.SignupModel;
 import com.tea.counter.utils.Constants;
@@ -38,7 +39,15 @@ public class CBillFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     ArrayList<SignupModel> sellerArrayList = new ArrayList<>();
     int itemPosition = 0;
+    CustomProgressDialog customProgressDialog;
     private Context mContext;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+        customProgressDialog = new CustomProgressDialog(mContext);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,14 +59,11 @@ public class CBillFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCBillBinding.inflate(inflater, container, false);
         initView();
-
         return binding.getRoot();
-
     }
 
     private void initView() {
         retriveSeller();
-
         binding.spinnerInCusotmerBill.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -65,11 +71,8 @@ public class CBillFragment extends Fragment {
                 textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.baseline_arrow_drop_down_24, 0);
 
                 Log.e("55555 : ", new Gson().toJson(sellerArrayList.get(position).getUserName()));
-
                 itemPosition = position;
                 GetBills(position);
-
-
             }
 
             @Override
@@ -81,6 +84,7 @@ public class CBillFragment extends Fragment {
     }
 
     public void retriveSeller() {
+        customProgressDialog.show();
         db.collection(Constants.COLLECTION_NAME).whereEqualTo(Constants.USER_TYPE, "0").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -100,14 +104,23 @@ public class CBillFragment extends Fragment {
                         signupModel.setFcmToken((String) document.getData().get(Constants.FCM_TOKEN));
                         sellerArrayList.add(signupModel);
                     }
-                    SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, sellerArrayList);
-                    binding.spinnerInCusotmerBill.setAdapter(spinnerAdapter);
 
+
+                    if (sellerArrayList.isEmpty()) {
+                        binding.recyclerViewBillCusotmer.setVisibility(View.GONE);
+                        binding.recyclerViewBillCusotmerAlt.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.recyclerViewBillCusotmer.setVisibility(View.VISIBLE);
+                        binding.recyclerViewBillCusotmerAlt.setVisibility(View.GONE);
+                        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, sellerArrayList);
+                        binding.spinnerInCusotmerBill.setAdapter(spinnerAdapter);
+                    }
                     //
-
+                    customProgressDialog.dismiss();
                 }
                 if (task.getResult().isEmpty()) {
                     Toast.makeText(mContext, "There is no Seller In Database", Toast.LENGTH_SHORT).show();
+                    customProgressDialog.dismiss();
                 } else {
                     Log.d("ERR22", "Error getting documents: ", task.getException());
                 }
@@ -151,21 +164,15 @@ public class CBillFragment extends Fragment {
                         BillAdapter billAdapter = new BillAdapter(billDetailsList, false);
                         binding.recyclerViewBillCusotmer.setAdapter(billAdapter);
                     }
+                    customProgressDialog.dismiss();
                 } else {
                     Log.d("ERR", "Error getting documents: ", task.getException());
-
+                    customProgressDialog.dismiss();
                 }
             }
         });
 
 
-    }
-
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
     }
 
 }

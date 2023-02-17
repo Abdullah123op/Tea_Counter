@@ -1,8 +1,10 @@
 package com.tea.counter.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ import com.tea.counter.R;
 import com.tea.counter.model.BillModel;
 import com.tea.counter.services.FcmNotificationsSender;
 import com.tea.counter.utils.Constants;
+import com.tea.counter.utils.Preference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +51,7 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         BillModel model = dataList.get(position);
         holder.txtMonthOfBill.setText(model.getBillMonth());
         holder.txtQtyOfBill.setText(model.getTotalQty());
@@ -109,7 +112,15 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
             holder.btnSendReminder.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FcmNotificationsSender notificationsSender = new FcmNotificationsSender(model.getFcmToken(), "Payment Reminder", "from " + model.getSellerName() + " for pending Bill of " + "₹" + model.getTotalAmountToPay(), v.getContext());
+                    holder.btnSendReminder.setEnabled(false); // disable the button
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            holder.btnSendReminder.setEnabled(true); // enable the button after 1 second
+                        }
+                    }, 5000);
+
+                    FcmNotificationsSender notificationsSender = new FcmNotificationsSender(model.getFcmToken(), "Payment Reminder", "from " + model.getSellerName() + " for pending Bill of " + "₹" + model.getTotalAmountToPay(), Preference.getImgUri(v.getContext()), v.getContext());
                     notificationsSender.SendNotifications();
                     Toast.makeText(v.getContext(), "Reminder Sent", Toast.LENGTH_SHORT).show();
                 }
@@ -163,8 +174,6 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
             txtSendReminder = itemView.findViewById(R.id.txtSendReminder);
             txtConfirmPayment = itemView.findViewById(R.id.txtConfirmPayment);
             layoutBill = itemView.findViewById(R.id.layoutBill);
-
-
         }
     }
 }

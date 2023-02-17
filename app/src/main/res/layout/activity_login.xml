@@ -52,7 +52,6 @@
             android:paddingTop="10dp"
             android:paddingRight="25dp"
             android:paddingBottom="10dp"
-            android:text="9725170454"
             android:textColor="@color/white"
             android:textColorHint="@color/editTextHintColor"
             app:layout_constraintEnd_toEndOf="parent"

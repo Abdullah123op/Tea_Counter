@@ -14,6 +14,7 @@ public class Constants {
     public static final String CITY = "city";
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
+    public static final String DEFAULT_IMAGE_URL = "https://firebasestorage.googleapis.com/v0/b/tea-counter-app.appspot.com/o/Default%20Image%2Fdefault.png?alt=media&token=805bcef9-7cde-4345-acbb-5310ebcbebb0";
 
     public static final String ITEM_ARRAY_LIST = "itemArrayList";
 
@@ -48,7 +49,6 @@ public class Constants {
     public static final String CUSTOMER_IMAGE = "customerImage";
 
 
-
     //TODO BILL DATABASE
     public static final String COLLECTION_NAME_BILL = "bills";
     public static final String TOTAL_QTY_BILL = "totalQtyBill";
@@ -63,7 +63,13 @@ public class Constants {
 
 
     //TODO MESSAGES
-    public static final String LOGOUT_CONFIRMATION_MESSAGE = "Are you Sure? You Want To LogOut";
-
-
+    public static final String LOGOUT_CONFIRMATION_MESSAGE = "Are You Sure? You Want To Logout";
+    public static final String NOTI_MESSAGE_LIST = "notificationMessageArrayList";
+    public static final String NOTI_TIME_STAMP = "notifiacationTimeStamp";
+    public static final String NOTI_CUSTOMER_UID = "notificationCustomerUid";
+    public static final String NOTI_SELLER_UID = "notificationSellerUid";
+    public static final String COLLECTION_NAME_NOTIFICATION = "notification";
+    public static final String NOTI_TIME_ORDER = "timeInNotification";
+    public static final String NOTI_CUSTOMER_NAME = "customerName";
+    public static final String NOTI_ADDITIONAL_CMT = "additionalComment";
 }

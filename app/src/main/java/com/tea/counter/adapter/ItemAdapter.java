@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.counter.R;
@@ -23,6 +24,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         this.itemClick = itemClick;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -33,15 +35,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         ItemModel model = dataList.get(position);
-        holder.idNumber.setText(String.valueOf(model.getId()));
+        holder.idNumber.setText(String.valueOf(position+1));
         holder.txtItemName.setText(model.getItemName());
         holder.txtItemPrice.setText(model.getPrice());
 
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 itemClick.onClick(position);
+//                notifyDataSetChanged();
             }
         });
 
@@ -69,7 +71,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             txtItemName = itemView.findViewById(R.id.txtItemName);
             txtItemPrice = itemView.findViewById(R.id.txtItemPrice);
             btnDelete = itemView.findViewById(R.id.btnDelete);
-
         }
     }
 }

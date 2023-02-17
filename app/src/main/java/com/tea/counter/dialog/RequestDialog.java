@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -32,8 +37,13 @@ import com.tea.counter.services.FcmNotificationsSender;
 import com.tea.counter.utils.Constants;
 import com.tea.counter.utils.Preference;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public class RequestDialog extends AppCompatDialogFragment {
@@ -41,9 +51,10 @@ public class RequestDialog extends AppCompatDialogFragment {
     DialogRequestBinding binding;
     String fcmToken;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    ArrayList<String> messageArraylist = new ArrayList<>();
+    ArrayList<ItemModel> messageArraylist = new ArrayList<>();
+    ArrayList<SignupModel> sellersArrayList = new ArrayList<>();
+    int itemPosition = 0;
     private Context mContext;
-
 
     @NonNull
     @Override
@@ -60,6 +71,18 @@ public class RequestDialog extends AppCompatDialogFragment {
         retriveSeller();
         initView();
 
+        binding.spinnerSeller.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                itemPosition = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -69,7 +92,7 @@ public class RequestDialog extends AppCompatDialogFragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    ArrayList<SignupModel> sellersArrayList = new ArrayList<>();
+
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         SignupModel signupModel = new SignupModel();
@@ -125,9 +148,9 @@ public class RequestDialog extends AppCompatDialogFragment {
                                 public void onClick(ArrayList<ItemModel> dataList) {
                                     Log.e("11111 : ", new Gson().toJson(dataList));
                                     messageArraylist.clear();
-                                    for (ItemModel dataItem : dataList) {
-                                        if (dataItem.getClick()) {
-                                            messageArraylist.add(dataItem.getItemName());
+                                    for (int i = 0; i < dataList.size(); i++) {
+                                        if (dataList.get(i).getClick()) {
+                                            messageArraylist.add(dataList.get(i));
                                         }
                                     }
                                 }
@@ -154,20 +177,79 @@ public class RequestDialog extends AppCompatDialogFragment {
         binding.btnRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!messageArraylist.isEmpty()) {
-                    String message = messageArraylist.toString().replace(",", " and").replace("[", "").replace("]", "");
-                    Log.d("1111 :  ", message);
-                    msgSend(Preference.getName(mContext) + " Wants " + message);
-                } else {
-                    Toast.makeText(mContext, "Please select at list one item.", Toast.LENGTH_SHORT).show();
+
+                binding.btnRequest.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnRequest.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
+                if (messageArraylist.isEmpty()) {
+                    Toast.makeText(mContext, "Please select at least one item.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                boolean atLeastOneItemValid = false;
+                for (ItemModel item : messageArraylist) {
+                    if (item.getClick() && item.getQty().equals("0") || item.getQty().equals("00") || item.getQty().equals("000") || item.getQty().equals("0000")) {
+                        atLeastOneItemValid = true;
+                        break;
+                    }
+                }
+                if (atLeastOneItemValid) {
+                    Toast.makeText(mContext, "Please set the quantity.", Toast.LENGTH_SHORT).show();
+                } else {
+                    binding.progressBarRequest.setVisibility(View.VISIBLE);
+                    binding.btnRequest.setVisibility(View.GONE);
+                    binding.btnCancelInRequestDialog.setVisibility(View.GONE);
+
+                    StringBuilder messageBuilder = new StringBuilder();
+                    for (int i = 0; i < messageArraylist.size(); i++) {
+                        messageBuilder.append(messageArraylist.get(i).getItemName());
+                        if (i != messageArraylist.size() - 1) {
+                            messageBuilder.append(", ");
+                        }
+                    }
+                    String message = messageBuilder.toString().replace(",", " and").replace("[", "").replace("]", "");
+                    Log.d("1111 :  ", new Gson().toJson(messageArraylist));
+
+                    Map<String, Object> notifications = new HashMap<>();
+                    notifications.put(Constants.NOTI_MESSAGE_LIST, messageArraylist);
+                    notifications.put(Constants.NOTI_TIME_STAMP, new Timestamp(System.currentTimeMillis()));
+                    notifications.put(Constants.NOTI_CUSTOMER_UID, FirebaseAuth.getInstance().getUid());
+                    notifications.put(Constants.NOTI_CUSTOMER_NAME, Preference.getName(mContext));
+                    notifications.put(Constants.NOTI_SELLER_UID, sellersArrayList.get(itemPosition).getUid());
+                    if (binding.etAdditionalComment.getText().toString().trim().length() > 0) {
+                        notifications.put(Constants.NOTI_ADDITIONAL_CMT, binding.etAdditionalComment.getText().toString().trim());
+                    }
+                    notifications.put(Constants.NOTI_TIME_ORDER, new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+
+                    db.collection(Constants.COLLECTION_NAME_NOTIFICATION).add(notifications).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            msgSend(Preference.getName(mContext) + " Wants " + message);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(mContext, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+                            dismiss();
+                        }
+                    });
+
+
+                }
+
+
             }
+
         });
         binding.btnCancelInRequestDialog.setOnClickListener(v -> dismiss());
     }
 
     private void msgSend(String message) {
-        FcmNotificationsSender notificationsSender = new FcmNotificationsSender(fcmToken, "New Order", message, mContext);
+        FcmNotificationsSender notificationsSender = new FcmNotificationsSender(fcmToken, "New Order", message, Preference.getImgUri(mContext), mContext);
         notificationsSender.SendNotifications();
         Toast.makeText(mContext, "Order Placed", Toast.LENGTH_SHORT).show();
         dismiss();

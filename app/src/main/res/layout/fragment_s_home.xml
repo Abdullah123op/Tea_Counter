@@ -103,12 +103,13 @@
 
                 <TextView
                     android:id="@+id/textView7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="28dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginTop="12dp"
-                    android:text="pcs"
+                    android:text="items"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_8sdp"
+                    android:textSize="@dimen/_7sdp"
                     app:layout_constraintStart_toEndOf="@+id/txtCups"
                     app:layout_constraintTop_toTopOf="@+id/txtCups" />
 

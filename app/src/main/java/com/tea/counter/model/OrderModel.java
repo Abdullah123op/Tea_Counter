@@ -2,13 +2,14 @@ package com.tea.counter.model;
 
 public class OrderModel {
 
-    private final String OrderDate;
+    private  String OrderDate;
     boolean visibility;
     private String OrderTitle;
     private String OrderTime;
     private String OrderPrice;
     private StringBuilder OrderDetails;
     private String ImageUrl;
+    private String AdditionalComment ;
 
 
 
@@ -21,6 +22,26 @@ public class OrderModel {
         ImageUrl = imageUrl;
         OrderDate = orderDate;
         this.visibility = false;
+    }
+
+
+    public OrderModel(String customerName, StringBuilder customItemList, String orderTime, String additionalComment) {
+        OrderTitle = customerName;
+        OrderDetails = customItemList;
+        OrderTime = orderTime;
+        AdditionalComment = additionalComment;
+    }
+
+    public void setOrderDate(String orderDate) {
+        OrderDate = orderDate;
+    }
+
+    public String getAdditionalComment() {
+        return AdditionalComment;
+    }
+
+    public void setAdditionalComment(String additionalComment) {
+        this.AdditionalComment = additionalComment;
     }
 
     public String getOrderDate() {

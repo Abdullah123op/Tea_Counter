@@ -44,7 +44,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/txtAdditemTitle" />
 
 
-            <androidx.appcompat.widget.AppCompatEditText
+            <EditText
                 android:id="@+id/etItemName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -76,14 +76,14 @@
                 app:layout_constraintTop_toBottomOf="@+id/etItemName" />
 
 
-            <androidx.appcompat.widget.AppCompatEditText
+            <EditText
                 android:id="@+id/etPrice"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/drawable_otp_box"
                 android:ems="10"
                 android:hint="Price"
-                android:inputType="phone"
+                android:inputType="number"
                 android:maxLength="2"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"

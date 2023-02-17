@@ -22,6 +22,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 import com.tea.counter.adapter.ExpandableAdapter;
 import com.tea.counter.databinding.FragmentCHomeBinding;
+import com.tea.counter.dialog.CustomProgressDialog;
 import com.tea.counter.model.OrderModel;
 import com.tea.counter.utils.Constants;
 import com.tea.counter.utils.Preference;
@@ -41,7 +42,15 @@ public class CHomeFragment extends Fragment {
     String totalPrice;
     double totalAmountSum = 0;
     int totalQty = 0;
+    CustomProgressDialog customProgressDialog;
     private Context mContext;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+        customProgressDialog = new CustomProgressDialog(mContext);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,7 +70,7 @@ public class CHomeFragment extends Fragment {
     }
 
     public void getOrders() {
-
+        customProgressDialog.show();
         Calendar startOfToday = Calendar.getInstance();
         startOfToday.set(Calendar.HOUR_OF_DAY, 0);
         startOfToday.set(Calendar.MINUTE, 0);
@@ -132,24 +141,20 @@ public class CHomeFragment extends Fragment {
                     } else {
                         Collections.reverse(orderList);
                         binding.recyclereViewinCustomer.setLayoutManager(new LinearLayoutManager(getContext()));
-                        ExpandableAdapter expandableAdapter = new ExpandableAdapter(orderList, true);
+                        ExpandableAdapter expandableAdapter = new ExpandableAdapter(orderList, true, false, false);
                         binding.recyclereViewinCustomer.setAdapter(expandableAdapter);
 
                         binding.recyclereViewinCustomer.setVisibility(View.VISIBLE);
                         binding.recyclerViewAlt.setVisibility(View.GONE);
                     }
+
+                    customProgressDialog.dismiss();
                 } else {
                     Log.d("ERR", "Error getting Orders: ", task.getException());
+                    customProgressDialog.dismiss();
                 }
             }
         });
 
-    }
-
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
     }
 }

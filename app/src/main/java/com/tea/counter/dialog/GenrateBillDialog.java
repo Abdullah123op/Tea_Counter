@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,7 +104,13 @@ public class GenrateBillDialog extends AppCompatDialogFragment {
         binding.btnGenrate2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                binding.btnGenrate2.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnGenrate2.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
                 SimpleDateFormat monthParse = new SimpleDateFormat("MMMM", Locale.ENGLISH);
                 SimpleDateFormat monthDisplay = new SimpleDateFormat("MM", Locale.ENGLISH);
                 try {

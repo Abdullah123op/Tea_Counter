@@ -37,10 +37,12 @@
         android:background="@android:color/transparent"
         android:enabled="false"
         android:gravity="center"
-        android:inputType="phone"
+        android:inputType="number"
         android:maxLength="2"
         android:singleLine="true"
-        android:text="0" />
+        android:hint="0"
+        android:textColorHint="#756F6F"
+      />
 
     <TextView
         android:id="@+id/txtTotalPrice"

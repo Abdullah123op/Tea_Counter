@@ -1,6 +1,7 @@
 package com.tea.counter.adapter;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -72,14 +73,16 @@ public class ConfirmItemAdapter extends RecyclerView.Adapter<ConfirmItemAdapter.
                 dataList.get(position).setClick(isChecked);
                 if (isChecked) {
                     holder.txtItemNameConfirmItem.setChecked(true);
+                    holder.etQTY.setTextColor(Color.parseColor("#FFFFFF"));
                     holder.etQTY.setEnabled(true);
                     holder.etQTY.requestFocus();
                     holder.etQTY.setBackgroundResource(android.R.drawable.editbox_dropdown_dark_frame);
                     itemClick.onClick(dataList);
                 } else {
                     holder.txtItemNameConfirmItem.setChecked(false);
+                    holder.etQTY.setTextColor(Color.parseColor("#000000"));
                     holder.etQTY.setBackgroundResource(android.R.color.transparent);
-                    holder.etQTY.setText("0");
+                    holder.etQTY.setText("");
                     holder.txtTotalPrice.setText("₹0");
                     holder.etQTY.setEnabled(false);
                 }
@@ -108,7 +111,7 @@ public class ConfirmItemAdapter extends RecyclerView.Adapter<ConfirmItemAdapter.
                     itemClick.onClick(dataList);
                     holder.txtTotalPrice.setText(String.valueOf(totalPrice));
                 } else {
-                    dataList.get(position).setQty("0");
+                    dataList.get(position).setQty("");
                     dataList.get(position).setTotalPrice("0");
                     itemClick.onClick(dataList);
                     holder.txtTotalPrice.setText("0");

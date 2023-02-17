@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -146,16 +147,31 @@ public class SignUpActivity extends AppCompatActivity {
 
     public void SignupBtnClickMethod() {
         binding.btnSignUpSubmit.setOnClickListener(v -> {
-
-            if (!validateName() | !validateRdButton() | !validateCity() | !validateAddress() | !validateImage()) {
+            binding.btnSignUpSubmit.setEnabled(false); // disable the button
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.btnSignUpSubmit.setEnabled(true); // enable the button after 1 second
+                }
+            }, 2000);
+            if (!validateName() | !validateRdButton() | !validateCity() | !validateAddress()) {
 
                 return;
             } else {
+                signupModel.setCity(binding.etCity.getText().toString().trim());
+                signupModel.setAddress(binding.etAddress.getText().toString().trim());
+
                 binding.progressBar.setVisibility(View.VISIBLE);
                 binding.btnSignUpSubmit.setVisibility(View.GONE);
                 signupModel.setUserType(userType);
                 signupModel.setUserName(binding.etName.getText().toString().trim());
-                saveToDataBase();
+
+                if (imageUri != null) {
+                    saveImage();
+                } else {
+                    uploadDatabase();
+                }
+
                 printLog();
             }
         });
@@ -254,13 +270,13 @@ public class SignUpActivity extends AppCompatActivity {
                     try {
                         addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                         //signupModel = new signupModel();
-                        signupModel.setAddress(addresses.get(0).getAddressLine(0));
-                        signupModel.setCity(addresses.get(0).getLocality());
+//                        signupModel.setAddress(addresses.get(0).getAddressLine(0));
+//                        signupModel.setCity(addresses.get(0).getLocality());
                         signupModel.setLatitude(String.valueOf(addresses.get(0).getLatitude()));
                         signupModel.setLongitude(String.valueOf(addresses.get(0).getLongitude()));
 
-                        binding.etCity.setText(signupModel.getCity());
-                        binding.etAddress.setText(signupModel.getAddress());
+                        binding.etCity.setText(addresses.get(0).getLocality());
+                        binding.etAddress.setText(addresses.get(0).getAddressLine(0));
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -296,8 +312,8 @@ public class SignUpActivity extends AppCompatActivity {
         Log.e("User", "" + Database);
     }
 
-    public void saveToDataBase() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    public void saveImage() {
+
         final StorageReference storageReference = storage.getReference().child("profileImage").child(FirebaseAuth.getInstance().getUid());
         storageReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -307,41 +323,7 @@ public class SignUpActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Uri uri) {
                         signupModel.setImageURL(String.valueOf(uri));
-                        Map<String, Object> user = new HashMap<>();
-
-
-                        user.put(Constants.MOBILE_NUMBER, signupModel.getMobileNumber());
-                        user.put(Constants.USER_TYPE, signupModel.getUserType());
-                        user.put(Constants.USER_NAME, signupModel.getUserName());
-                        user.put(Constants.CITY, signupModel.getCity());
-                        user.put(Constants.ADDRESS, signupModel.getAddress());
-                        user.put(Constants.LATITUDE, signupModel.getLatitude());
-                        user.put(Constants.LONGITUDE, signupModel.getLongitude());
-                        user.put(Constants.UID, signupModel.getUid());
-                        user.put(Constants.FCM_TOKEN, signupModel.getFcmToken());
-                        user.put(Constants.IMAGE, signupModel.getImageURL());
-
-                        // Add a new document with a generated ID
-                        firebaseFirestore.collection(Constants.COLLECTION_NAME).document(userId).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                SetDataPref();
-                                Toast.makeText(SignUpActivity.this, getString(R.string.saved_database_success_msg), Toast.LENGTH_SHORT).show();
-
-                                if (Preference.getUserType(SignUpActivity.this).equals("0")) {
-                                    startActivity(new Intent(SignUpActivity.this, SellerActivity.class));
-                                } else if (Preference.getUserType(SignUpActivity.this).equals("1")) {
-                                    startActivity(new Intent(SignUpActivity.this, CustomerActivity.class));
-                                }
-                                finish();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("TAG", "Error adding document", e);
-                                Toast.makeText(SignUpActivity.this, getText(R.string.failed_database_msg), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        uploadDatabase();
                     }
                 });
             }
@@ -374,14 +356,62 @@ public class SignUpActivity extends AppCompatActivity {
 //
 //    }
 
+    public void uploadDatabase() {
+
+        Map<String, Object> user = new HashMap<>();
+        user.put(Constants.MOBILE_NUMBER, signupModel.getMobileNumber());
+        user.put(Constants.USER_TYPE, signupModel.getUserType());
+        user.put(Constants.USER_NAME, signupModel.getUserName());
+        user.put(Constants.CITY, signupModel.getCity());
+        user.put(Constants.ADDRESS, signupModel.getAddress());
+        user.put(Constants.LATITUDE, signupModel.getLatitude());
+        user.put(Constants.LONGITUDE, signupModel.getLongitude());
+        user.put(Constants.UID, signupModel.getUid());
+        user.put(Constants.FCM_TOKEN, signupModel.getFcmToken());
+
+        if (imageUri != null) {
+            user.put(Constants.IMAGE, signupModel.getImageURL());
+        } else {
+            user.put(Constants.IMAGE, Constants.DEFAULT_IMAGE_URL);
+        }
+
+
+        // Add a new document with a generated ID
+        firebaseFirestore.collection(Constants.COLLECTION_NAME).document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+                SetDataPref();
+                Toast.makeText(SignUpActivity.this, getString(R.string.saved_database_success_msg), Toast.LENGTH_SHORT).show();
+
+                if (Preference.getUserType(SignUpActivity.this).equals("0")) {
+                    startActivity(new Intent(SignUpActivity.this, SellerActivity.class));
+                } else if (Preference.getUserType(SignUpActivity.this).equals("1")) {
+                    startActivity(new Intent(SignUpActivity.this, CustomerActivity.class));
+                }
+                finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("TAG", "Error adding document", e);
+                Toast.makeText(SignUpActivity.this, getText(R.string.failed_database_msg), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void SetDataPref() {
         Preference.setName(this, signupModel.getUserName());
         Preference.setUserType(this, signupModel.getUserType());
         Preference.setMobileNo(this, signupModel.getMobileNumber());
         Preference.setCity(this, signupModel.getCity());
         Preference.setAddress(this, signupModel.getAddress());
-        Preference.setImgUri(this, signupModel.getImageURL());
         Preference.setFcmToken(this, signupModel.getFcmToken());
+        if (imageUri != null) {
+            Preference.setImgUri(this, signupModel.getImageURL());
+        } else Preference.setImgUri(this, Constants.DEFAULT_IMAGE_URL);
+
+
     }
 
 }

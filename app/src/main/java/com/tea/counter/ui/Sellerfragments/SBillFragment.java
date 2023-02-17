@@ -24,6 +24,7 @@ import com.tea.counter.R;
 import com.tea.counter.adapter.BillAdapter;
 import com.tea.counter.adapter.SpinnerAdapter;
 import com.tea.counter.databinding.FragmentSBillBinding;
+import com.tea.counter.dialog.CustomProgressDialog;
 import com.tea.counter.dialog.GenrateBillDialog;
 import com.tea.counter.model.BillModel;
 import com.tea.counter.model.SignupModel;
@@ -40,7 +41,15 @@ public class SBillFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     ArrayList<SignupModel> customerArrayList = new ArrayList<>();
     int itemPosition = 0;
+    CustomProgressDialog customProgressDialog;
     private Context mContext;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+        customProgressDialog = new CustomProgressDialog(mContext);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,8 +66,8 @@ public class SBillFragment extends Fragment {
     }
 
     public void initView() {
+        customProgressDialog.show();
         retrieveCustomer();
-
         binding.spinnerSellerBill.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -109,14 +118,22 @@ public class SBillFragment extends Fragment {
                         signupModel.setFcmToken((String) document.getData().get(Constants.FCM_TOKEN));
                         customerArrayList.add(signupModel);
                     }
-                    SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, customerArrayList);
-                    binding.spinnerSellerBill.setAdapter(spinnerAdapter);
 
-                    //
+
+                    if (customerArrayList.isEmpty()) {
+                        binding.recyclerViewBill.setVisibility(View.GONE);
+                        binding.recyclerViewBillAlt.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.recyclerViewBill.setVisibility(View.VISIBLE);
+                        binding.recyclerViewBillAlt.setVisibility(View.GONE);
+                        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, customerArrayList);
+                        binding.spinnerSellerBill.setAdapter(spinnerAdapter);
+                    }
 
                 }
                 if (task.getResult().isEmpty()) {
                     Toast.makeText(mContext, "There is no Customer In Database", Toast.LENGTH_SHORT).show();
+                    customProgressDialog.dismiss();
                 } else {
                     Log.d("ERR", "Error getting documents: ", task.getException());
                 }
@@ -160,9 +177,10 @@ public class SBillFragment extends Fragment {
                     } else {
                         binding.recyclerViewBill.setVisibility(View.VISIBLE);
                         binding.recyclerViewBillAlt.setVisibility(View.GONE);
-                        BillAdapter billAdapter = new BillAdapter(billDetailsList , true);
+                        BillAdapter billAdapter = new BillAdapter(billDetailsList, true);
                         binding.recyclerViewBill.setAdapter(billAdapter);
                     }
+                    customProgressDialog.dismiss();
                 } else {
                     Log.d("ERR", "Error getting documents: ", task.getException());
                 }
@@ -170,9 +188,4 @@ public class SBillFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
-    }
 }

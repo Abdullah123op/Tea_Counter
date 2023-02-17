@@ -26,6 +26,7 @@ import com.tea.counter.R;
 import com.tea.counter.adapter.ExpandableAdapter;
 import com.tea.counter.adapter.SpinnerAdapter;
 import com.tea.counter.databinding.FragmentSOrderBinding;
+import com.tea.counter.dialog.CustomProgressDialog;
 import com.tea.counter.model.OrderModel;
 import com.tea.counter.model.SignupModel;
 import com.tea.counter.utils.Constants;
@@ -47,12 +48,13 @@ public class SOrderFragment extends Fragment {
     int itemPosition = 0;
     int totalQty = 0;
     double totalAmountSum = 0;
+    CustomProgressDialog customProgressDialog;
     private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        customProgressDialog = new CustomProgressDialog(mContext);
     }
 
     @Override
@@ -64,6 +66,7 @@ public class SOrderFragment extends Fragment {
     }
 
     public void initView() {
+        customProgressDialog.show();
         retrieveCustomer();
         binding.spinnerSellerOrder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -105,14 +108,20 @@ public class SOrderFragment extends Fragment {
                         signupModel.setFcmToken((String) document.getData().get(Constants.FCM_TOKEN));
                         customerArrayList.add(signupModel);
                     }
-                    SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, customerArrayList);
-                    binding.spinnerSellerOrder.setAdapter(spinnerAdapter);
-
                     //
-
+                    if (customerArrayList.isEmpty()) {
+                        binding.recyclerViewInSellerOrder.setVisibility(View.GONE);
+                        binding.recyclerViewInSellerOrderAlt.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.recyclerViewInSellerOrder.setVisibility(View.VISIBLE);
+                        binding.recyclerViewInSellerOrderAlt.setVisibility(View.GONE);
+                        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(mContext, customerArrayList);
+                        binding.spinnerSellerOrder.setAdapter(spinnerAdapter);
+                    }
                 }
                 if (task.getResult().isEmpty()) {
                     Toast.makeText(mContext, "There is no Customer In Database", Toast.LENGTH_SHORT).show();
+                    customProgressDialog.dismiss();
                 } else {
                     Log.d("ERR", "Error getting documents: ", task.getException());
                 }
@@ -193,14 +202,15 @@ public class SOrderFragment extends Fragment {
                     } else {
                         Collections.reverse(orderList);
                         binding.recyclerViewInSellerOrder.setLayoutManager(new LinearLayoutManager(getContext()));
-                        ExpandableAdapter expandableAdapter = new ExpandableAdapter(orderList, false);
+                        ExpandableAdapter expandableAdapter = new ExpandableAdapter(orderList, false, true, false);
                         binding.recyclerViewInSellerOrder.setAdapter(expandableAdapter);
 
                         binding.recyclerViewInSellerOrder.setVisibility(View.VISIBLE);
                         binding.recyclerViewInSellerOrderAlt.setVisibility(View.GONE);
-
-
                     }
+
+                    customProgressDialog.dismiss();
+
                 } else {
                     Log.d("ERR", "Error getting Orders: ", task.getException());
                 }

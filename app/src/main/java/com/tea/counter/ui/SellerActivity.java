@@ -1,6 +1,7 @@
 package com.tea.counter.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.tea.counter.ui.Sellerfragments.SHomeFragment;
 import com.tea.counter.ui.Sellerfragments.SItemsFragment;
 import com.tea.counter.ui.Sellerfragments.SOrderFragment;
 import com.tea.counter.ui.Sellerfragments.SProfileFragment;
+import com.tea.counter.ui.notification.NotificationFragment;
 import com.tea.counter.utils.Constants;
 import com.tea.counter.utils.Preference;
 
@@ -43,11 +45,22 @@ public class SellerActivity extends AppCompatActivity {
         Preference.setIsLogin(this);
         replaceFragment(new SHomeFragment());
         updateFcm();
+
         binding.sellerNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setEnabled(false); // disable the selected item
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        item.setEnabled(true); // enable the selected item after 3 seconds
+                    }
+                }, 2000);
+
                 if (item.getItemId() == R.id.sellerHome) {
+
                     replaceFragment(new SHomeFragment());
+
                 }
                 if (item.getItemId() == R.id.sellerOrder) {
                     replaceFragment(new SOrderFragment());
@@ -69,7 +82,28 @@ public class SellerActivity extends AppCompatActivity {
         binding.btnItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                binding.btnItem.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnItem.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
                 replaceFragment(new SItemsFragment());
+            }
+        });
+
+        binding.btnNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.btnNotification.setEnabled(false); // disable the button
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnNotification.setEnabled(true); // enable the button after 1 second
+                    }
+                }, 2000);
+                replaceFragment(new NotificationFragment());
             }
         });
     }

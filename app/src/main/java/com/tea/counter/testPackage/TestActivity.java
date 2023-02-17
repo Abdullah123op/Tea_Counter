@@ -159,8 +159,9 @@ public class TestActivity extends AppCompatActivity {
         binding.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String fcmToken = "dzCmlmsqTCevM7XZIkL244:APA91bEc-iP0JMziV6UCAY31brPTfmOTSaTWkvawCPus2AEtK-Y0dQS47h2LCvNbwKbs_rFTD_zBUteSjVWeGL1kqA7CTQjLG6s8ylqcI7vwzvPOC4XZPr7ropo23QzG5__L8cqvV3Zj";
-                FcmNotificationsSender notificationsSender = new FcmNotificationsSender(fcmToken, "Title", "Message", getApplicationContext());
+                FcmNotificationsSender notificationsSender = new FcmNotificationsSender(fcmToken, "Title", "Message", " ", getApplicationContext());
                 notificationsSender.SendNotifications();
 
             }

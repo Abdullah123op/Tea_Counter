@@ -1,6 +1,7 @@
 package com.tea.counter.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -33,7 +34,7 @@ import java.util.Map;
 
 public class CustomerActivity extends AppCompatActivity {
     ActivityCustomerBinding binding;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +47,18 @@ public class CustomerActivity extends AppCompatActivity {
         replaceFragment(new CHomeFragment());
         Preference.setIsLogin(this);
 
+
         binding.customerNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setEnabled(false); // disable the selected item
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        item.setEnabled(true); // enable the selected item after 3 seconds
+                    }
+                }, 2000);
+
                 if (item.getItemId() == R.id.customerHome) {
                     replaceFragment(new CHomeFragment());
                 }
