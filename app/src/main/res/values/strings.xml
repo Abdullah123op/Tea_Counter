@@ -71,6 +71,7 @@
 
     <string name="title_activity_main">MainActivity</string>
     <string name="resend_timer_text">Resend in %d seconds</string>
+    <string name="title_activity_seller" />
 
 
 </resources>

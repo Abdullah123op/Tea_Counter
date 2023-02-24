@@ -42,10 +42,30 @@ public class SellerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_seller);
+        initView();
+    }
+
+    private void initView() {
         Preference.setIsLogin(this);
         replaceFragment(new SHomeFragment());
         updateFcm();
+        onClicks();
+        iconHighLite();
+    }
+// Check if there is a new notification that is not read
 
+    public void iconHighLite(){
+        boolean newNotificationNotRead = false;
+        if (newNotificationNotRead) {
+
+          //  binding.btnNotification.setBackgroundResource(R.drawable.notification_icon_background);
+        }
+
+    }
+
+
+
+    public void onClicks(){
         binding.sellerNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -106,13 +126,6 @@ public class SellerActivity extends AppCompatActivity {
                 replaceFragment(new NotificationFragment());
             }
         });
-    }
-
-    private void replaceFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.sellerFrameLayout, fragment);
-        fragmentTransaction.commit();
     }
 
     private void updateFcm() {
@@ -176,5 +189,12 @@ public class SellerActivity extends AppCompatActivity {
 
         });
 
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.sellerFrameLayout, fragment);
+        fragmentTransaction.commit();
     }
 }

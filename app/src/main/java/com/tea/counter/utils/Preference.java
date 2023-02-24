@@ -15,6 +15,8 @@ public class Preference {
     private static final String PREF_FILE = "teaApp";
     private static final String IS_LOGIN = "isLogin";
 
+    private static final String LAST_EXECUTION_TIMESTAMP_KEY = "last_execution_timestamp";
+
     public static boolean getIsLogin(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(IS_LOGIN, false);
@@ -119,6 +121,17 @@ public class Preference {
         prefsPrivateEditor.apply();
     }
 
+    public static long getLastExecution(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        return sharedPreferences.getLong(LAST_EXECUTION_TIMESTAMP_KEY, 0);
+    }
+    public static void setLastExecution(Context context ,  Long value) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefPrivateEditor = sharedPreferences.edit();
+        prefPrivateEditor.putLong(LAST_EXECUTION_TIMESTAMP_KEY , value);
+        prefPrivateEditor.apply();
+
+    }
 
     public static void clearAllPref(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);

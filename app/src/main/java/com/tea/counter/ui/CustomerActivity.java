@@ -27,6 +27,7 @@ import com.tea.counter.ui.Customerfragments.CHomeFragment;
 import com.tea.counter.ui.Customerfragments.COrderFragment;
 import com.tea.counter.ui.Customerfragments.CProfileFragment;
 import com.tea.counter.utils.Constants;
+import com.tea.counter.utils.Permissions;
 import com.tea.counter.utils.Preference;
 
 import java.util.HashMap;
@@ -66,8 +67,18 @@ public class CustomerActivity extends AppCompatActivity {
                     replaceFragment(new COrderFragment());
                 }
                 if (item.getItemId() == R.id.customerRequest) {
-                    RequestDialog requestDialog = new RequestDialog();
-                    requestDialog.show(getSupportFragmentManager(), "request_dialog");
+                    Permissions permissions = new Permissions();
+                    if (permissions.isRecordingOk(CustomerActivity.this)) {
+                        if (permissions.isStorageOk(CustomerActivity.this)) {
+                            RequestDialog requestDialog = new RequestDialog();
+                            requestDialog.show(getSupportFragmentManager(), "request_dialog");
+                        } else {
+                            permissions.requestStorage(CustomerActivity.this);
+                        }
+                    } else {
+                        permissions.requestRecording(CustomerActivity.this);
+                        permissions.requestStorage(CustomerActivity.this);
+                    }
                 }
                 if (item.getItemId() == R.id.customerBill) {
                     replaceFragment(new CBillFragment());

@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@android:color/transparent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/otp_dialog_design"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
             <EditText
                 android:id="@+id/txtOtpVerificationTitle"
@@ -52,6 +48,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="@dimen/_30sdp"
                 android:orientation="vertical"
+                android:visibility="visible"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_max="300dp"
@@ -60,22 +57,110 @@
                 app:layout_constraintTop_toBottomOf="@+id/spinnerSeller" />
 
 
-            <ProgressBar
-                android:id="@+id/progressBarRequest"
-                style="?android:attr/progressBarStyle"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/audioPlayerView"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="@dimen/_30sdp"
+                android:layout_marginEnd="@dimen/_30sdp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_max="300dp"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerSeller">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/animationView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toTopOf="@+id/btnPlayPause"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:lottie_autoPlay="true"
+                    app:lottie_fileName="audio_playing.json"
+                    app:lottie_loop="true"
+                    app:lottie_speed="1" />
+
+                <ImageView
+                    android:id="@+id/btnPlayPause"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.497"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:srcCompat="@drawable/pause" />
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
+                    app:layout_constraintBottom_toTopOf="@+id/btnPlayPause"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <EditText
+                android:id="@+id/etAdditionalComment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="39dp"
+                android:hint="Additional Comment"
+                android:padding="10dp"
+                android:paddingStart="5dp"
+                android:paddingTop="0dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#322E2E"
+                android:textSize="@dimen/_10sdp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/record_button"
+                app:layout_constraintEnd_toStartOf="@+id/record_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/record_button" />
+
+
+            <com.devlomi.record_view.RecordView
+                android:id="@+id/record_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:counter_time_color="#ff0000"
+                app:layout_constraintBottom_toBottomOf="@+id/record_button"
+                app:layout_constraintEnd_toStartOf="@+id/record_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/record_button"
+                app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
+                app:slide_to_cancel_arrow_color="#000000"
+                app:slide_to_cancel_bounds="8dp"
+                app:slide_to_cancel_margin_right="10dp"
+                app:slide_to_cancel_text="Slide To Cancel" />
+
+
+            <com.devlomi.record_view.RecordButton
+                android:id="@+id/record_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="39dp"
+                android:background="@drawable/recv_bg_mic"
+                android:scaleType="centerInside"
+                app:layout_constraintBottom_toTopOf="@+id/btnLayoutRequest"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etAdditionalComment" />
+                app:layout_constraintTop_toBottomOf="@+id/recyclerViewCustomerRequest"
+                app:mic_icon="@drawable/recv_ic_mic_white" />
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/lLayout"
+                android:id="@+id/btnLayoutRequest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -83,12 +168,26 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
+                <ProgressBar
+                    android:id="@+id/progressBarRequest"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="25dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/etAdditionalComment" />
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnRequest"
                     android:layout_width="@dimen/_125sdp"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_6sdp"
                     android:layout_marginEnd="@dimen/_10sdp"
-                    android:layout_marginBottom="32dp"
+                    android:layout_marginBottom="@dimen/_20sdp"
                     android:background="@drawable/btnbackground"
                     android:text="Request"
                     android:textColor="@color/white"
@@ -100,35 +199,20 @@
                     android:layout_width="@dimen/_125sdp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_marginBottom="32dp"
+                    android:layout_marginTop="@dimen/_6sdp"
 
+                    android:layout_marginBottom="@dimen/_2sdp"
                     android:background="@drawable/btncancelbackground"
                     android:text="@string/btn_cancel_txt"
                     android:textColor="@color/white"
                     android:textStyle="bold"
+
                     android:visibility="visible" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <EditText
-                android:id="@+id/etAdditionalComment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Additional Comment"
-                android:padding="10dp"
-                android:paddingStart="5dp"
-                android:paddingTop="0dp"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#322E2E"
-                android:textSize="@dimen/_10sdp"
-                app:layout_constraintBottom_toTopOf="@+id/lLayout"
-                app:layout_constraintEnd_toEndOf="@+id/recyclerViewCustomerRequest"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/recyclerViewCustomerRequest"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerViewCustomerRequest"
-                app:layout_constraintVertical_bias="0.151" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>

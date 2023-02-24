@@ -237,15 +237,16 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+
             <Button
                 android:id="@+id/btnLogoutProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="64dp"
                 android:background="@drawable/btnbackground"
                 android:text="LogOut"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_bias="0.463"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutCompat2" />
 

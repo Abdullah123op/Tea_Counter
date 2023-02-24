@@ -3,7 +3,6 @@ package com.tea.counter.ui.Customerfragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -61,8 +59,10 @@ public class CProfileFragment extends Fragment {
     FirebaseStorage storage = FirebaseStorage.getInstance();
     FragmentCProfileBinding binding;
     Uri imageUri = null;
+
     CustomProgressDialog progressDialog;
     private Context mContext;
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -331,9 +331,6 @@ public class CProfileFragment extends Fragment {
     }
 
 
-
-
-
     public void updateOrdersTable() {
         db.collection(Constants.COLLECTION_NAME_ORDERS).whereEqualTo(Constants.CUSTOMER_UID, FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
             WriteBatch batch = db.batch();
@@ -439,7 +436,6 @@ public class CProfileFragment extends Fragment {
             alert.show();
         });
     }
-
 
 
 }

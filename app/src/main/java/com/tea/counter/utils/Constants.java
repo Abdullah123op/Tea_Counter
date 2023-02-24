@@ -72,4 +72,5 @@ public class Constants {
     public static final String NOTI_TIME_ORDER = "timeInNotification";
     public static final String NOTI_CUSTOMER_NAME = "customerName";
     public static final String NOTI_ADDITIONAL_CMT = "additionalComment";
+    public static final String NOTI_AUDIO_URL = "audioUrl";
 }

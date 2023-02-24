@@ -1,170 +1,216 @@
 package com.tea.counter.testPackage;
 
+import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.devlomi.record_view.OnBasketAnimationEnd;
+import com.devlomi.record_view.OnRecordListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.tea.counter.R;
 import com.tea.counter.databinding.ActivityTestBinding;
-import com.tea.counter.services.FcmNotificationsSender;
+
+import java.io.File;
+import java.io.IOException;
 
 public class TestActivity extends AppCompatActivity {
-    private final static int REQUEST_CODE = 100;
-    private final int GALLERY_REQ_CODE = 1000;
-    private final int CAMARA_REQ_CODE = 2000;
+
     ActivityTestBinding binding;
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageReference;
+    String audioPath;
+    MediaPlayer mediaPlayer = new MediaPlayer();
+    private boolean isAudioPlaybackCompleted = false;
+    private MediaRecorder mediaRecorder;
 
-    //    ImageView img_img;
-//    Button btnSaveDatabase;
-//    EditText otp_textbox_one, otp_textbox_two, otp_textbox_three, otp_textbox_four;
-//    Button verify_otp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_test);
-//        img_img = findViewById(R.id.img_img);
-//        btnSaveDatabase = findViewById(R.id.btnSaveDatabase);
-//        StorageReference storageRef = storage.getReference();
-//        StorageReference imagesRef = storageRef.child("images");
+
+       // setUpRecordingView();
+    }
+
+//    public void setUpRecordingView() {
 //
 //
-//        img_img.setOnClickListener(new View.OnClickListener() {
+//        binding.recordButton.setRecordView(binding.recordView);
+//        binding.recordButton.setListenForRecord(true);
+//        binding.recordView.setSlideToCancelTextColor(Color.parseColor("#322E2E"));
+//        binding.recordView.setTrashIconColor(Color.parseColor("#FFFFFF"));
+//        binding.recordView.setSlideToCancelArrowColor(Color.parseColor("#322E2E"));
+////        binding.recordView.setCounterTimeColor(Color.parseColor("#5737D7"));
+////        binding.recordView.setSmallMicColor(Color.parseColor("#2D4CDD"));
+//
+//        binding.recordView.setOnRecordListener(new OnRecordListener() {
 //            @Override
-//            public void onClick(View v) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
-//                builder.setTitle("Pick an image").setItems(new CharSequence[]{"Camara", "Photos"}, new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        switch (which) {
-//                            case 0:
-//                                // Code for picking an image from the gallery goes here
-//                                Intent iCamara = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                                startActivityForResult(iCamara, CAMARA_REQ_CODE);
-//                                break;
-//                            case 1:
-//                                // Code for taking a photo with the camera goes here
-//                                Intent iGallery = new Intent(Intent.ACTION_PICK);
-//                                iGallery.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                                startActivityForResult(iGallery, GALLERY_REQ_CODE);
-//                                break;
-//                        }
-//                    }
-//                });
-//                AlertDialog alert = builder.create();
-//                alert.show();
+//            public void onStart() {
+//                //Start Recording..
+//                Log.w("2222", "onStart");
+//                setUpRecording();
+//                try {
+//                    mediaRecorder.prepare();
+//                    mediaRecorder.start();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+////                binding.etAdditionalComment.setVisibility(View.GONE);
+//                binding.recordView.setVisibility(View.VISIBLE);
 //            }
 //
-//        });
-//        btnSaveDatabase.setOnClickListener(new View.OnClickListener() {
 //            @Override
-//            public void onClick(View v) {
-//                BitmapDrawable drawable = (BitmapDrawable) img_img.getDrawable();
-//                Bitmap bitmap = drawable.getBitmap();
-//                Date currentDate = new Date();
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                byte[] data = baos.toByteArray();
-//                StorageReference imageRef = imagesRef.child("image" + currentDate.getTime() + ".jpg");
+//            public void onCancel() {
+//                //On Swipe To Cancel
+//                Log.w("11111", "onCancel");
+//                mediaRecorder.reset();
+//                mediaRecorder.release();
+//                File file = new File(audioPath);
+//                if (file.exists()) file.delete();
+//            }
 //
-//                UploadTask uploadTask = imageRef.putBytes(data);
-//                uploadTask.addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFinish(long recordTime, boolean limitReached) {
+//                // Stop recording
+//                try {
+//                    mediaRecorder.stop();
+//                    mediaRecorder.release();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//                // Show the path to the recorded file in a Toast
+//                Toast.makeText(TestActivity.this, "Recorded  ",  Toast.LENGTH_SHORT).show();
+//
+//                // Hide the record view
+//                binding.recordView.setVisibility(View.GONE);
+//
+//                // Create a MediaPlayer instance and set the data source to the recorded audio file
+//
+//                try {
+//                    mediaPlayer.setDataSource(audioPath);
+//                    mediaPlayer.prepare();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                // Start playing the recorded audio
+//                mediaPlayer.start();
+//                // Change the icon of the play/pause button to "pause"
+//                binding.btnPlayPause.setImageResource(R.drawable.pause);
+//
+//                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 //                    @Override
-//                    public void onFailure(@NonNull Exception exception) {
-//                        Log.e("Failed" , "Task Failed");
-//                    }
-//                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                        Log.e("Success" , "Saved Success");
+//                    public void onCompletion(MediaPlayer mp) {
+//                        isAudioPlaybackCompleted = true;
+//                        binding.btnPlayPause.setImageResource(R.drawable.play);
 //                    }
 //                });
+//            }
+//
+//
+//            @Override
+//            public void onLessThanSecond() {
+//                //When the record time is less than One Second
+//                Log.w("6666", "onLessThanSecond");
+//                mediaRecorder.reset();
+//                mediaRecorder.release();
+//
+//                File file = new File(audioPath);
+//                if (file.exists()) {
+//                    file.delete();
+//                }
+//                binding.recordView.setVisibility(View.GONE);
+//                // binding.etAdditionalComment.setVisibility(View.VISIBLE);
+//            }
+//        });
+//        binding.recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
+//            @Override
+//            public void onAnimationEnd() {
+//                Log.w("RecordView", "Basket Animation Finished");
+//                binding.recordView.setVisibility(View.GONE);
+//                //  binding.etAdditionalComment.setVisibility(View.VISIBLE);
+//
+//            }
+//        });
+//
+//        playRecording();
+//    }
+//
+//    public void playRecording() {
+//        binding.btnPlayPause.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (audioPath != null) {
+//                    if (mediaPlayer.isPlaying()) {
+//                        mediaPlayer.pause();
+//                        binding.btnPlayPause.setImageResource(R.drawable.play);
+//                    } else {
+//                        if (isAudioPlaybackCompleted) {
+//                            // If the audio playback is completed, reset the MediaPlayer
+//                            // and set the data source again before starting playback
+//                            try {
+//                                mediaPlayer.reset();
+//                                mediaPlayer.setDataSource(audioPath);
+//                                mediaPlayer.prepare();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                            isAudioPlaybackCompleted = false;
+//                        }
+//                        mediaPlayer.start();
+//                        binding.btnPlayPause.setImageResource(R.drawable.pause);
+//                    }
+//                } else {
+//                    Toast.makeText(TestActivity.this, "Null", Toast.LENGTH_SHORT).show();
+//                }
 //            }
 //        });
 //
 //    }
 //
 //    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == RESULT_OK) {
-//            if (requestCode == CAMARA_REQ_CODE && data != null && data.getExtras() != null) {
-//                Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-//                img_img.setImageBitmap(imageBitmap);
-//            }
-//            if (requestCode == GALLERY_REQ_CODE) {
-//                assert data != null;
-//                img_img.setImageURI(data.getData());
+//    protected void onDestroy() {
+//        super.onDestroy();
 //
-//            }
+//        if (mediaPlayer != null) {
+//            mediaPlayer.release();
+//            mediaPlayer = null;
 //        }
 //    }
-
-//        otp_textbox_one = findViewById(R.id.otp_edit_box1);
-//        otp_textbox_two = findViewById(R.id.otp_edit_box2);
-//        otp_textbox_three = findViewById(R.id.otp_edit_box3);
-//        otp_textbox_four = findViewById(R.id.otp_edit_box4);
-//        verify_otp = findViewById(R.id.verify_otp_btn);
 //
 //
-//        EditText[] edit = {otp_textbox_one, otp_textbox_two, otp_textbox_three, otp_textbox_four};
+//    public void setUpRecording() {
+//        mediaRecorder = new MediaRecorder();
+//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+//        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 //
-////        otp_textbox_one.addTextChangedListener(new GenericTextWatcher(otp_textbox_one, edit));
-////        otp_textbox_two.addTextChangedListener(new GenericTextWatcher(otp_textbox_two, edit));
-////        otp_textbox_three.addTextChangedListener(new GenericTextWatcher(otp_textbox_three, edit));
-////        otp_textbox_four.addTextChangedListener(new GenericTextWatcher(otp_textbox_four, edit));
+//        File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//
+//        if (!file.exists()) file.mkdirs();
+//        audioPath = file.getAbsolutePath() + File.separator + "Tea-Counter.mp3";
+//
+//        mediaRecorder.setOutputFile(audioPath);
+//
+//    }
 //
 //
-//        verify_otp.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(getApplicationContext(), "Login Successfull", Toast.LENGTH_SHORT).show();
+//    private String getHumanTimeText(long time) {
+//        long seconds = time / 1000;
+//        long minutes = seconds / 60;
+//        long hours = minutes / 60;
 //
-//            }
-//        });
-//        binding.btnLoad.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                storageReference = FirebaseStorage.getInstance().getReference("images/EmGElqgFb0bYOgrsyjt3PbSHWXv1.jpg");
-//
-//                try {
-//                    File localFile = File.createTempFile("tempfile", "img");
-//                    storageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-//                        @Override
-//                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-//                            Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-//                            binding.imgLoad.setImageBitmap(bitmap);
-//
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Toast.makeText(TestActivity.this, "Failed To load Image", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        });
-//        String MobileNumber = "971562435";
-//        Preference.setMobileNo(this,  MobileNumber);
-//
-//        binding.pref.setText(Preference.getMobileNo(this));
-
-        binding.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String fcmToken = "dzCmlmsqTCevM7XZIkL244:APA91bEc-iP0JMziV6UCAY31brPTfmOTSaTWkvawCPus2AEtK-Y0dQS47h2LCvNbwKbs_rFTD_zBUteSjVWeGL1kqA7CTQjLG6s8ylqcI7vwzvPOC4XZPr7ropo23QzG5__L8cqvV3Zj";
-                FcmNotificationsSender notificationsSender = new FcmNotificationsSender(fcmToken, "Title", "Message", " ", getApplicationContext());
-                notificationsSender.SendNotifications();
-
-            }
-        });
-    }
+//        return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60);
+//    }
 }
