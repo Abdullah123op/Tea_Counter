@@ -2,6 +2,7 @@ package com.tea.counter.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -10,17 +11,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -28,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
+import com.tea.counter.R;
 import com.tea.counter.adapter.MonthAdapter;
 import com.tea.counter.databinding.DialogGenrateBillBinding;
 import com.tea.counter.model.MonthModel;
@@ -44,7 +50,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class GenrateBillDialog extends AppCompatDialogFragment {
+public class GenrateBillDialog extends BottomSheetDialogFragment {
     DialogGenrateBillBinding binding;
     String selectedMonth = "";
     int monthNumber;
@@ -62,16 +68,35 @@ public class GenrateBillDialog extends AppCompatDialogFragment {
     int totalQty = 0;
     private Context mContext;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // set custom style for bottom sheet rounded top corners
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
+
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        binding = DialogGenrateBillBinding.inflate(LayoutInflater.from(mContext));
-        return new AlertDialog.Builder(requireActivity()).setView(binding.getRoot()).create();
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                // Set the navigation bar color when the BottomSheetDialog is shown
+                Window window = getDialog().getWindow();
+                if (window != null) {
+                    window.setNavigationBarColor(ContextCompat.getColor(getContext(), R.color.dialogboxBackGround));
+                }
+            }
+        });
+        return dialog;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = DialogGenrateBillBinding.inflate(LayoutInflater.from(mContext));
         Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getDialog().setCancelable(false);
         initView();

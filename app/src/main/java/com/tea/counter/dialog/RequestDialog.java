@@ -13,8 +13,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -22,6 +24,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.devlomi.record_view.OnBasketAnimationEnd;
 import com.devlomi.record_view.OnRecordListener;
@@ -61,7 +65,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class RequestDialog extends BottomSheetDialogFragment  {
+public class RequestDialog extends BottomSheetDialogFragment {
     private final Handler handler = new Handler();
     DialogRequestBinding binding;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -78,10 +82,29 @@ public class RequestDialog extends BottomSheetDialogFragment  {
     private boolean isAudioPlaybackCompleted = false;
 
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // set custom style for bottom sheet rounded top corners
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
+
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new BottomSheetDialog(requireContext(), getTheme());
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                // Set the navigation bar color when the BottomSheetDialog is shown
+                Window window = getDialog().getWindow();
+                if (window != null) {
+                    window.setNavigationBarColor(ContextCompat.getColor(getContext(), R.color.dialogboxBackGround));
+                }
+            }
+        });
+        return dialog;
     }
 
     @Nullable
@@ -90,7 +113,6 @@ public class RequestDialog extends BottomSheetDialogFragment  {
         binding = DialogRequestBinding.inflate(inflater, container, false);
         Objects.requireNonNull(getDialog().getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getDialog().setCancelable(false);
-
         initView();
 
         return binding.getRoot();
@@ -106,6 +128,15 @@ public class RequestDialog extends BottomSheetDialogFragment  {
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
+//        if (mediaRecorder != null) {
+//            int state = mediaRecorder.getState();
+//            if (state == MediaRecorder.STATE_INITIALIZED || state == MediaRecorder.STATE_RECORDING) {
+//                mediaRecorder.stop();
+//                mediaRecorder.release();
+//                mediaRecorder = null;
+//            }
+//        }
+
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
@@ -134,7 +165,7 @@ public class RequestDialog extends BottomSheetDialogFragment  {
     private void initView() {
         retrieveSeller();
         btnOnClick();
-        setConstraints();
+        // setConstraints();
         setUpRecordingView();
 
         binding.spinnerSeller.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -384,8 +415,10 @@ public class RequestDialog extends BottomSheetDialogFragment  {
         binding.recordView.setTrashIconColor(Color.parseColor("#FFFFFF"));
         binding.recordView.setSlideToCancelArrowColor(Color.parseColor("#322E2E"));
         binding.recordView.setTimeLimit(30000);
+       // binding.recordButton.setScaleUpTo(1.4f);
 //        binding.recordView.setCounterTimeColor(Color.parseColor("#5737D7"));
 //        binding.recordView.setSmallMicColor(Color.parseColor("#2D4CDD"));
+
 
         binding.recordView.setOnRecordListener(new OnRecordListener() {
             @Override
@@ -427,14 +460,14 @@ public class RequestDialog extends BottomSheetDialogFragment  {
                 Toast.makeText(mContext, "Recorded  ", Toast.LENGTH_SHORT).show();
 
                 // Hide the record view
-                binding.recordView.setVisibility(View.GONE);
-                binding.recyclerViewCustomerRequest.setVisibility(View.GONE);
+                //  binding.recyclerViewCustomerRequest.setVisibility(View.GONE);
                 binding.recordView.setVisibility(View.GONE);
                 binding.recordButton.setVisibility(View.GONE);
+                binding.etAdditionalComment.setVisibility(View.VISIBLE);
                 binding.audioPlayerView.setVisibility(View.VISIBLE);
 
 
-                setConstraints();
+                //  setConstraints();
 
                 // Create a MediaPlayer instance and set the data source to the recorded audio file
 
@@ -516,6 +549,11 @@ public class RequestDialog extends BottomSheetDialogFragment  {
                 binding.recordView.setVisibility(View.GONE);
                 binding.etAdditionalComment.setVisibility(View.VISIBLE);
             }
+
+            @Override
+            public void onLock() {
+
+            }
         });
         binding.recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
             @Override
@@ -528,7 +566,14 @@ public class RequestDialog extends BottomSheetDialogFragment  {
         });
         playRecording();
     }
-
+//
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        if (event.getAction() == MotionEvent.ACTION_UP) {
+//            onStop();
+//        }
+//        return super.onTouchEvent(event);
+//    }
     public void playRecording() {
         binding.btnPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override

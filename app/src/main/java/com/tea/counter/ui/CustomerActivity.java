@@ -72,6 +72,8 @@ public class CustomerActivity extends AppCompatActivity {
                         if (permissions.isStorageOk(CustomerActivity.this)) {
                             RequestDialog requestDialog = new RequestDialog();
                             requestDialog.show(getSupportFragmentManager(), "request_dialog");
+//                           TestDialog testDialog = new TestDialog();
+//                            testDialog.show(getSupportFragmentManager(), "test_dialog");
                         } else {
                             permissions.requestStorage(CustomerActivity.this);
                         }

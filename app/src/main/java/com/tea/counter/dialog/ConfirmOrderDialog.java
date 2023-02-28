@@ -2,6 +2,7 @@ package com.tea.counter.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -10,18 +11,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,9 +34,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
+import com.tea.counter.R;
 import com.tea.counter.adapter.ConfirmItemAdapter;
 import com.tea.counter.adapter.SpinnerAdapter;
 import com.tea.counter.databinding.DialogConfirmOrderBinding;
+import com.tea.counter.databinding.DialogRequestBinding;
 import com.tea.counter.model.ItemModel;
 import com.tea.counter.model.SignupModel;
 import com.tea.counter.services.FcmNotificationsSender;
@@ -48,7 +55,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class ConfirmOrderDialog extends AppCompatDialogFragment {
+public class ConfirmOrderDialog extends BottomSheetDialogFragment {
     DialogConfirmOrderBinding binding;
     int itemPosition = 0;
     ArrayList<SignupModel> customerArrayList = new ArrayList<>();
@@ -59,16 +66,42 @@ public class ConfirmOrderDialog extends AppCompatDialogFragment {
     double totalAmount = 0;
     private Context mContext;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // set custom style for bottom sheet rounded top corners
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
+
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        binding = DialogConfirmOrderBinding.inflate(LayoutInflater.from(mContext));
-        return new AlertDialog.Builder(requireActivity()).setView(binding.getRoot()).create();
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                // Set the navigation bar color when the BottomSheetDialog is shown
+                Window window = getDialog().getWindow();
+                if (window != null) {
+                    window.setNavigationBarColor(ContextCompat.getColor(getContext(), R.color.dialogboxBackGround));
+                }
+            }
+        });
+        return dialog;
     }
+
+//    @NonNull
+//    @Override
+//    public Dialog onCreateDialog(Bundle savedInstanceState) {
+//        binding = DialogConfirmOrderBinding.inflate(LayoutInflater.from(mContext));
+//        return new AlertDialog.Builder(requireActivity()).setView(binding.getRoot()).create();
+//    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = DialogConfirmOrderBinding.inflate(inflater, container, false);
         Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getDialog().setCancelable(false);
         initView();
@@ -200,7 +233,7 @@ public class ConfirmOrderDialog extends AppCompatDialogFragment {
 
                 boolean atLeastOneItemValid = false;
                 for (ItemModel item : orderedItemList) {
-                    if (item.getClick() &&  item.getQty().equals("") ||item.getQty().equals("0") || item.getQty().equals("00") || item.getQty().equals("000") || item.getQty().equals("0000")) {
+                    if (item.getClick() && item.getQty().equals("") || item.getQty().equals("0") || item.getQty().equals("00") || item.getQty().equals("000") || item.getQty().equals("0000")) {
                         atLeastOneItemValid = true;
                         break;
                     }

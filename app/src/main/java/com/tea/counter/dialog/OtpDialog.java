@@ -2,6 +2,7 @@ package com.tea.counter.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,18 +13,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -45,7 +48,7 @@ import com.tea.counter.utils.Preference;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class OtpDialog extends AppCompatDialogFragment {
+public class OtpDialog extends BottomSheetDialogFragment {
 
     OtpdialogboxBinding binding;
     String mainOTP;
@@ -55,22 +58,42 @@ public class OtpDialog extends AppCompatDialogFragment {
     private int resendCount = 0;
     private CountDownTimer resendTimer;
 
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // set custom style for bottom sheet rounded top corners
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
+
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                // Set the navigation bar color when the BottomSheetDialog is shown
+                Window window = getDialog().getWindow();
+                if (window != null) {
+                    window.setNavigationBarColor(ContextCompat.getColor(getContext(), R.color.dialogboxBackGround));
+                }
+            }
+        });
+        return dialog;
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
     }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        binding = OtpdialogboxBinding.inflate(LayoutInflater.from(mContext));
-        return new AlertDialog.Builder(requireActivity()).setView(binding.getRoot()).create();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = OtpdialogboxBinding.inflate(LayoutInflater.from(mContext));
         Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getDialog().setCancelable(false);
         initView();
