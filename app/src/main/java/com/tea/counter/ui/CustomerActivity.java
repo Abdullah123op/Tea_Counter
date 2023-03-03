@@ -22,10 +22,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.tea.counter.R;
 import com.tea.counter.databinding.ActivityCustomerBinding;
 import com.tea.counter.dialog.RequestDialog;
-import com.tea.counter.ui.Customerfragments.CBillFragment;
 import com.tea.counter.ui.Customerfragments.CHomeFragment;
-import com.tea.counter.ui.Customerfragments.COrderFragment;
 import com.tea.counter.ui.Customerfragments.CProfileFragment;
+import com.tea.counter.ui.Customerfragments.OrderFragment;
 import com.tea.counter.utils.Constants;
 import com.tea.counter.utils.Permissions;
 import com.tea.counter.utils.Preference;
@@ -64,7 +63,7 @@ public class CustomerActivity extends AppCompatActivity {
                     replaceFragment(new CHomeFragment());
                 }
                 if (item.getItemId() == R.id.customerOrders) {
-                    replaceFragment(new COrderFragment());
+                    replaceFragment(new OrderFragment());
                 }
                 if (item.getItemId() == R.id.customerRequest) {
                     Permissions permissions = new Permissions();
@@ -83,7 +82,7 @@ public class CustomerActivity extends AppCompatActivity {
                     }
                 }
                 if (item.getItemId() == R.id.customerBill) {
-                    replaceFragment(new CBillFragment());
+                    replaceFragment(new BillFragment());
                 }
                 if (item.getItemId() == R.id.customerProfile) {
                     replaceFragment(new CProfileFragment());

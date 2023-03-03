@@ -13,36 +13,31 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
-import com.devlomi.record_view.OnBasketAnimationEnd;
 import com.devlomi.record_view.OnRecordListener;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.tea.counter.R;
 import com.tea.counter.adapter.ItemInCustomerAdapter;
@@ -94,14 +89,21 @@ public class RequestDialog extends BottomSheetDialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                // Set the navigation bar color when the BottomSheetDialog is shown
-                Window window = getDialog().getWindow();
-                if (window != null) {
-                    window.setNavigationBarColor(ContextCompat.getColor(getContext(), R.color.dialogboxBackGround));
-                }
+
+        dialog.setOnShowListener(dialogInterface -> {
+            // Set the navigation bar color when the BottomSheetDialog is shown
+            BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialogInterface;
+            FrameLayout bottomSheet = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            assert bottomSheet != null;
+            BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
+
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setDraggable(false);
+
+
+            Window window = getDialog().getWindow();
+            if (window != null) {
+                window.setNavigationBarColor(ContextCompat.getColor(getContext(), R.color.dialogboxBackGround));
             }
         });
         return dialog;
@@ -112,6 +114,7 @@ public class RequestDialog extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DialogRequestBinding.inflate(inflater, container, false);
         Objects.requireNonNull(getDialog().getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         getDialog().setCancelable(false);
         initView();
 
@@ -128,15 +131,6 @@ public class RequestDialog extends BottomSheetDialogFragment {
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-//        if (mediaRecorder != null) {
-//            int state = mediaRecorder.getState();
-//            if (state == MediaRecorder.STATE_INITIALIZED || state == MediaRecorder.STATE_RECORDING) {
-//                mediaRecorder.stop();
-//                mediaRecorder.release();
-//                mediaRecorder = null;
-//            }
-//        }
-
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
@@ -181,28 +175,11 @@ public class RequestDialog extends BottomSheetDialogFragment {
         });
     }
 
-    private void setConstraints() {
-        if (binding.recyclerViewCustomerRequest.getVisibility() == View.VISIBLE) {
-
-            ConstraintLayout.LayoutParams recordButtonParams = (ConstraintLayout.LayoutParams) binding.recordButton.getLayoutParams();
-            recordButtonParams.topToBottom = binding.recyclerViewCustomerRequest.getId();
-            binding.recordButton.setLayoutParams(recordButtonParams);
-
-        } else if (binding.audioPlayerView.getVisibility() == View.VISIBLE) {
-
-            ConstraintLayout.LayoutParams recordButtonParams = (ConstraintLayout.LayoutParams) binding.recordButton.getLayoutParams();
-            recordButtonParams.topToBottom = binding.audioPlayerView.getId();
-            binding.recordButton.setLayoutParams(recordButtonParams);
-        }
-    }
-
     public void retrieveSeller() {
         db.collection(Constants.COLLECTION_NAME).whereEqualTo(Constants.USER_TYPE, "0").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-
-
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         SignupModel signupModel = new SignupModel();
                         signupModel.setUid((String) document.getData().get(Constants.UID));
@@ -283,45 +260,27 @@ public class RequestDialog extends BottomSheetDialogFragment {
     }
 
     private void btnOnClick() {
-        binding.btnRequest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        binding.btnRequest.setOnClickListener(v -> {
 
-                binding.btnRequest.setEnabled(false); // disable the button
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        binding.btnRequest.setEnabled(true); // enable the button after 1 second
-                    }
-                }, 2000);
-                if (audioPath != null) {
-                    audioSendMethod();
-                    return;
+            binding.btnRequest.setEnabled(false); // disable the button
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.btnRequest.setEnabled(true); // enable the button after 1 second
                 }
+            }, 2000);
 
-                if (messageArraylist.isEmpty()) {
-                    Toast.makeText(mContext, "Please select at least one item.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                boolean atLeastOneItemValid = false;
-                for (ItemModel item : messageArraylist) {
-                    if (item.getClick() && item.getQty().equals("") || item.getQty().equals("0") || item.getQty().equals("00") || item.getQty().equals("000") || item.getQty().equals("0000")) {
-                        atLeastOneItemValid = true;
-                        break;
-                    }
-                }
-                if (atLeastOneItemValid) {
-                    Toast.makeText(mContext, "Please set the quantity.", Toast.LENGTH_SHORT).show();
-                } else {
-                    messageSendMethod();
-                }
-
+            if (messageArraylist.isEmpty() && audioPath == null) {
+                Toast.makeText(mContext, "Please select at least one item.", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                messageSendMethod();
             }
 
         });
         binding.btnCancelInRequestDialog.setOnClickListener(v -> dismiss());
     }
+
 
     private void messageSendMethod() {
         binding.progressBarRequest.setVisibility(View.VISIBLE);
@@ -344,82 +303,41 @@ public class RequestDialog extends BottomSheetDialogFragment {
         notifications.put(Constants.NOTI_CUSTOMER_UID, FirebaseAuth.getInstance().getUid());
         notifications.put(Constants.NOTI_CUSTOMER_NAME, Preference.getName(mContext));
         notifications.put(Constants.NOTI_SELLER_UID, sellersArrayList.get(itemPosition).getUid());
+        notifications.put(Constants.NOTI_TIME_ORDER, new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
         if (binding.etAdditionalComment.getText().toString().trim().length() > 0) {
             notifications.put(Constants.NOTI_ADDITIONAL_CMT, binding.etAdditionalComment.getText().toString().trim());
         }
-        notifications.put(Constants.NOTI_TIME_ORDER, new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
-        db.collection(Constants.COLLECTION_NAME_NOTIFICATION).add(notifications).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                msgSend(Preference.getName(mContext) + " Wants " + message);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(mContext, "Something Went Wrong", Toast.LENGTH_SHORT).show();
-                dismiss();
-            }
-        });
-    }
+        if (audioPath != null) {
+            Uri audioUri = Uri.fromFile(new File(audioPath));
+            final StorageReference storageReference = storage.getReference().child("RequestAudio").child("audio-" + FirebaseAuth.getInstance().getUid() + "-" + new Timestamp(System.currentTimeMillis()));
+            storageReference.putFile(audioUri).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-    private void audioSendMethod() {
+                notifications.put(Constants.NOTI_AUDIO_URL, uri);
 
-        binding.progressBarRequest.setVisibility(View.VISIBLE);
-        binding.btnRequest.setVisibility(View.GONE);
-        binding.btnCancelInRequestDialog.setVisibility(View.GONE);
-
-        Uri audioUri = Uri.fromFile(new File(audioPath));
-
-        final StorageReference storageReference = storage.getReference().child("RequestAudio").child("audio-" + FirebaseAuth.getInstance().getUid() + "-" + new Timestamp(System.currentTimeMillis()));
-        storageReference.putFile(audioUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Log.w("storageSuccessAudio", " Uploaded In Firebase Storage");
-                        Map<String, Object> notifications = new HashMap<>();
-                        notifications.put(Constants.NOTI_TIME_STAMP, new Timestamp(System.currentTimeMillis()));
-                        notifications.put(Constants.NOTI_CUSTOMER_UID, FirebaseAuth.getInstance().getUid());
-                        notifications.put(Constants.NOTI_CUSTOMER_NAME, Preference.getName(mContext));
-                        notifications.put(Constants.NOTI_SELLER_UID, sellersArrayList.get(itemPosition).getUid());
-                        notifications.put(Constants.NOTI_AUDIO_URL, uri);
-                        notifications.put(Constants.NOTI_TIME_ORDER, new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Calendar.getInstance().getTime()));
-                        db.collection(Constants.COLLECTION_NAME_NOTIFICATION).add(notifications).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.w("firebaseSuccessAudio", " Uploaded In Firebase FireStore");
-                                msgSend(Preference.getName(mContext) + " Sent Audio ");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(mContext, "Something Went Wrong", Toast.LENGTH_SHORT).show();
-                                dismiss();
-                            }
-                        });
-                    }
+                db.collection(Constants.COLLECTION_NAME_NOTIFICATION).add(notifications).addOnSuccessListener(documentReference -> msgSend(Preference.getName(mContext) + " Sent Audio ")).addOnFailureListener(e -> {
+                    Toast.makeText(mContext, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+                    dismiss();
                 });
-            }
-        });
+            }));
+            return;
+        }
 
+        db.collection(Constants.COLLECTION_NAME_NOTIFICATION).add(notifications).addOnSuccessListener(documentReference -> msgSend(Preference.getName(mContext) + " Wants " + message)).addOnFailureListener(e -> {
+            Toast.makeText(mContext, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+            dismiss();
+        });
     }
+
 
     public void setUpRecordingView() {
-
         binding.recordButton.setRecordView(binding.recordView);
         binding.recordButton.setListenForRecord(true);
         binding.recordView.setSlideToCancelTextColor(Color.parseColor("#322E2E"));
         binding.recordView.setTrashIconColor(Color.parseColor("#FFFFFF"));
         binding.recordView.setSlideToCancelArrowColor(Color.parseColor("#322E2E"));
         binding.recordView.setTimeLimit(30000);
-       // binding.recordButton.setScaleUpTo(1.4f);
-//        binding.recordView.setCounterTimeColor(Color.parseColor("#5737D7"));
-//        binding.recordView.setSmallMicColor(Color.parseColor("#2D4CDD"));
-
-
         binding.recordView.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
@@ -445,8 +363,8 @@ public class RequestDialog extends BottomSheetDialogFragment {
                 mediaRecorder.release();
                 File file = new File(audioPath);
                 if (file.exists()) file.delete();
+                audioPath = null;
             }
-
             @Override
             public void onFinish(long recordTime, boolean limitReached) {
                 // Stop recording
@@ -456,8 +374,7 @@ public class RequestDialog extends BottomSheetDialogFragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                Toast.makeText(mContext, "Recorded  ", Toast.LENGTH_SHORT).show();
+                Log.w("1111", " Recorded");
 
                 // Hide the record view
                 //  binding.recyclerViewCustomerRequest.setVisibility(View.GONE);
@@ -466,11 +383,10 @@ public class RequestDialog extends BottomSheetDialogFragment {
                 binding.etAdditionalComment.setVisibility(View.VISIBLE);
                 binding.audioPlayerView.setVisibility(View.VISIBLE);
 
-
-                //  setConstraints();
-
                 // Create a MediaPlayer instance and set the data source to the recorded audio file
-
+                if (mediaPlayer == null) {
+                    mediaPlayer = new MediaPlayer();
+                }
                 try {
                     mediaPlayer.setDataSource(audioPath);
                     mediaPlayer.prepare();
@@ -511,26 +427,18 @@ public class RequestDialog extends BottomSheetDialogFragment {
                         handler.postDelayed(this, 10);
                     }
                 };
-//                threadUpdateSeek.start();
-
-                mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        // Set the maximum value of the seekbar to the duration of the media
-                        binding.seekBar.setMax(mp.getDuration());
-                        // Start the handler to update the seekbar
-                        handler.postDelayed(runnable, 10);
-                    }
+                mediaPlayer.setOnPreparedListener(mp -> {
+                    // Set the maximum value of the seekbar to the duration of the media
+                    binding.seekBar.setMax(mp.getDuration());
+                    // Start the handler to update the seekbar
+                    handler.postDelayed(runnable, 10);
                 });
 
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        isAudioPlaybackCompleted = true;
-                        binding.btnPlayPause.setImageResource(R.drawable.play);
-                        binding.animationView.pauseAnimation();
-                        handler.removeCallbacks(runnable);
-                    }
+                mediaPlayer.setOnCompletionListener(mp -> {
+                    isAudioPlaybackCompleted = true;
+                    binding.btnPlayPause.setImageResource(R.drawable.play);
+                    binding.animationView.pauseAnimation();
+                    handler.removeCallbacks(runnable);
                 });
             }
 
@@ -555,57 +463,59 @@ public class RequestDialog extends BottomSheetDialogFragment {
 
             }
         });
-        binding.recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
-            @Override
-            public void onAnimationEnd() {
-                Log.w("RecordView", "Basket Animation Finished");
-                binding.recordView.setVisibility(View.GONE);
-                binding.etAdditionalComment.setVisibility(View.VISIBLE);
+        binding.recordView.setOnBasketAnimationEndListener(() -> {
+            Log.w("RecordView", "Basket Animation Finished");
+            binding.recordView.setVisibility(View.GONE);
+            binding.etAdditionalComment.setVisibility(View.VISIBLE);
 
-            }
         });
         playRecording();
     }
-//
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        if (event.getAction() == MotionEvent.ACTION_UP) {
-//            onStop();
-//        }
-//        return super.onTouchEvent(event);
-//    }
+
     public void playRecording() {
-        binding.btnPlayPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (audioPath != null) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
-                        binding.animationView.pauseAnimation();
-                        binding.btnPlayPause.setImageResource(R.drawable.play);
-                    } else {
-                        if (isAudioPlaybackCompleted) {
-                            // If the audio playback is completed, reset the MediaPlayer
-                            // and set the data source again before starting playback
-                            try {
-                                mediaPlayer.reset();
-                                mediaPlayer.setDataSource(audioPath);
-                                mediaPlayer.prepare();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            isAudioPlaybackCompleted = false;
-                        }
-                        mediaPlayer.start();
-                        binding.animationView.playAnimation();
-                        binding.btnPlayPause.setImageResource(R.drawable.pause);
-                    }
+        binding.btnPlayPause.setOnClickListener(v -> {
+            if (audioPath != null) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                    binding.animationView.pauseAnimation();
+                    binding.btnPlayPause.setImageResource(R.drawable.play);
                 } else {
-                    Toast.makeText(mContext, "Null", Toast.LENGTH_SHORT).show();
+                    if (isAudioPlaybackCompleted) {
+                        // If the audio playback is completed, reset the MediaPlayer
+                        // and set the data source again before starting playback
+                        try {
+                            mediaPlayer.reset();
+                            mediaPlayer.setDataSource(audioPath);
+                            mediaPlayer.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        isAudioPlaybackCompleted = false;
+                    }
+                    mediaPlayer.start();
+                    binding.animationView.playAnimation();
+                    binding.btnPlayPause.setImageResource(R.drawable.pause);
                 }
+            } else {
+                Toast.makeText(mContext, "Null", Toast.LENGTH_SHORT).show();
             }
         });
 
+        binding.btnDeleteAudio.setOnClickListener(v -> {
+
+            mediaPlayer.reset();
+            mediaPlayer.release();
+            mediaPlayer = null;
+            binding.audioPlayerView.setVisibility(View.GONE);
+            if (audioPath != null) {
+                File audioFile = new File(audioPath);
+                if (audioFile.exists()) {
+                    audioFile.delete();
+                }
+            }
+            binding.recordButton.setVisibility(View.VISIBLE);
+            audioPath = null;
+        });
     }
 
     public void setUpRecording() {
@@ -630,4 +540,3 @@ public class RequestDialog extends BottomSheetDialogFragment {
     }
 
 }
-

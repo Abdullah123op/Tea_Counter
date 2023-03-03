@@ -121,10 +121,8 @@ public class CHomeFragment extends Fragment {
                             totalQty = (int) (totalQty + Double.parseDouble(qty));
                             Log.d("4545", "onComplete: " + totalQty);
                             binding.txtCustomerPcs.setText(String.valueOf(totalQty));
-
                             String customString = name + "   ×   " + qty + "   =   " + totalPrice + "\n";
                             customItemList.append(customString);
-
 
                         }
                         Log.e("454", String.valueOf(customItemList));

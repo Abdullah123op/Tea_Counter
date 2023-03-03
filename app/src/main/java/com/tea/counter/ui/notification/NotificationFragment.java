@@ -129,21 +129,22 @@ public class NotificationFragment extends Fragment {
                             audioUrl = (String) document.getData().get(Constants.NOTI_AUDIO_URL);
                         }
 
-                        StringBuilder customItemList = null;
+                        StringBuilder customItemList = new StringBuilder();
+                        for (int i = 0; i < itemList.size(); i++) {
+                            HashMap<String, Object> item = itemList.get(i);
 
-                        if (itemList != null) {
-                            for (int i = 0; i < itemList.size(); i++) {
-                                HashMap<String, Object> item = itemList.get(i);
-                                name = (String) item.get(Constants.ITEM_NAME);
-                                price = (String) item.get(Constants.ITEM_PRICE);
-                                qty = (String) item.get("qty");
-                                assert qty != null;
-                                totalQty = (int) (totalQty + Double.parseDouble(qty));
-                                Log.d("4545", "onComplete: " + totalQty);
-                                String customString = name + "   ×   " + qty + "\n";
-                                customItemList = new StringBuilder();
-                                customItemList.append(customString);
+                            name = (String) item.get(Constants.ITEM_NAME);
+                            price = (String) item.get(Constants.ITEM_PRICE);
+                            qty = (String) item.get("qty");
+
+                            String customString;
+                            if (!qty.equals("")) {
+                                customString = name + "   ×   " + qty + "\n";
+
+                            } else {
+                                customString = name + "\n";
                             }
+                            customItemList.append(customString);
                         }
 
                         OrderModel orderModelNotification = new OrderModel(customerName, customItemList, orderTime, additionalComment, audioUrl);

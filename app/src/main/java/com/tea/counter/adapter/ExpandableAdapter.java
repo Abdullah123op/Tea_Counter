@@ -7,17 +7,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.tea.counter.R;
 import com.tea.counter.model.OrderModel;
 
@@ -27,15 +31,14 @@ import java.util.List;
 
 public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.ViewHolder> {
     private final Handler handler = new Handler();
-    private final boolean openClose = false;
     List<OrderModel> dataList;
     boolean isHomePage;
     boolean isSellerSide;
     boolean isNotificationSide;
     MediaPlayer mediaPlayer;
-    private Runnable runnable;
     private boolean isAudioPlaybackCompleted = false;
     private boolean isPlayedOnce = false;
+    private Runnable runnable;
 
 
     public ExpandableAdapter(ArrayList<OrderModel> dataList, boolean isHomePage, boolean isSellerSide, boolean isNotificationSide) {
@@ -59,17 +62,35 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
         model.setAudio(model.getAudioUrl() != null);
 
         if (isNotificationSide) {
+            Log.e("8585 List : ", new Gson().toJson(dataList));
             boolean isVisible = dataList.get(position).isVisibility();
             Drawable myDrawable = ContextCompat.getDrawable(holder.imgUserAdapter.getContext(), R.drawable.new_order);
             holder.imgUserAdapter.setImageDrawable(myDrawable);
             holder.txtPriceExpandable.setVisibility(View.GONE);
 
-            if (model.isAudio()) {
+            if (model.getOrderDetails() == null) {
+                holder.layoutTxtList.setVisibility(View.GONE);
+            } else if (model.getOrderDetails() != null) {
+
+                holder.layoutTxtList.setVisibility(View.VISIBLE);
+                if (model.getAdditionalComment() != null) {
+                    holder.txtAdditional.setVisibility(View.VISIBLE);
+                    holder.txtAdditional.setText("Message : " + model.getAdditionalComment());
+                } else if (model.getAdditionalComment() == null) {
+                    holder.txtAdditional.setVisibility(View.INVISIBLE);
+                }
+                Log.d("4554", "" + model.getAdditionalComment());
+                holder.txtTitleExpandable.setText(" New Order from  " + model.getOrderTitle());
+
+                holder.orderItemDetails.setText(model.getOrderDetails());
+                holder.txtTimeExpandable.setText(model.getOrderTime());
+            }
+
+            if (!model.isAudio()) {
+                holder.layoutAudioList.setVisibility(View.GONE);
+            } else if (model.isAudio()) {
+                holder.layoutAudioList.setVisibility(View.VISIBLE);
                 mediaPlayer = new MediaPlayer();
-                holder.textView6.setVisibility(View.GONE);
-                holder.orderItemDetails.setVisibility(View.GONE);
-                holder.seekBarList.setVisibility(View.VISIBLE);
-                holder.btnPlayPauseList.setVisibility(View.VISIBLE);
 
                 holder.seekBarList.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
@@ -98,99 +119,72 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
                     }
                 };
 
-                mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        // Set the maximum value of the seekbar to the duration of the media
-                        holder.seekBarList.setMax(mp.getDuration());
-                        // Start the handler to update the seekbar
-                        handler.postDelayed(runnable, 10);
-                    }
+                mediaPlayer.setOnPreparedListener(mp -> {
+                    // Set the maximum value of the seekbar to the duration of the media
+                    holder.seekBarList.setMax(mp.getDuration());
+                    // Start the handler to update the seekbar
+                    handler.postDelayed(runnable, 10);
                 });
 
-                holder.btnPlayPauseList.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        if (mediaPlayer.isPlaying()) {
-                            mediaPlayer.pause();
-                            holder.btnPlayPauseList.setImageResource(R.drawable.play);
-                        } else {
-
-                            Log.e("TAG", "onClick: ");
-
-                            if (!isPlayedOnce) {
-                                holder.btnPlayPauseList.setVisibility(View.GONE);
-                                holder.btnPlayPauseListAlt.setVisibility(View.VISIBLE);
-
-                                try {
-                                    mediaPlayer.setDataSource(model.getAudioUrl());
-                                    mediaPlayer.prepare();
-                                    isPlayedOnce = true;
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-
-                            if (isAudioPlaybackCompleted) {
-                                mediaPlayer.reset();
-                                try {
-                                    mediaPlayer.setDataSource(model.getAudioUrl());
-                                    mediaPlayer.prepare();
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                isAudioPlaybackCompleted = false;
-                            }
-
-                            holder.btnPlayPauseList.setImageResource(R.drawable.pause);
-                            mediaPlayer.start();
-                            holder.btnPlayPauseListAlt.setVisibility(View.GONE);
-                            holder.btnPlayPauseList.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        isAudioPlaybackCompleted = true;
+                holder.btnPlayPauseList.setOnClickListener(v -> {
+                    holder.btnPlayPauseListAlt.setVisibility(View.VISIBLE);
+                    holder.btnPlayPauseList.setVisibility(View.GONE);
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.pause();
                         holder.btnPlayPauseList.setImageResource(R.drawable.play);
-                        handler.removeCallbacks(runnable);
+                        holder.btnPlayPauseListAlt.setVisibility(View.GONE);
+                        holder.btnPlayPauseList.setVisibility(View.VISIBLE);
+                    } else {
+
+                        Log.e("TAG", "onClick: ");
+
+                        if (!isPlayedOnce) {
+                            holder.btnPlayPauseList.setVisibility(View.GONE);
+                            holder.btnPlayPauseListAlt.setVisibility(View.VISIBLE);
+
+                            try {
+                                mediaPlayer.setDataSource(model.getAudioUrl());
+                                mediaPlayer.prepare();
+                                isPlayedOnce = true;
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        if (isAudioPlaybackCompleted) {
+                            mediaPlayer.reset();
+                            try {
+                                mediaPlayer.setDataSource(model.getAudioUrl());
+                                mediaPlayer.prepare();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            isAudioPlaybackCompleted = false;
+                        }
+
+                        holder.btnPlayPauseList.setImageResource(R.drawable.pause);
+                        mediaPlayer.start();
+                        holder.btnPlayPauseListAlt.setVisibility(View.GONE);
+                        holder.btnPlayPauseList.setVisibility(View.VISIBLE);
                     }
+                });
+
+                mediaPlayer.setOnCompletionListener(mp -> {
+                    isAudioPlaybackCompleted = true;
+                    holder.btnPlayPauseList.setImageResource(R.drawable.play);
+                    handler.removeCallbacks(runnable);
                 });
 
                 holder.txtTitleExpandable.setText(" New Voice Order from  " + model.getOrderTitle());
                 holder.txtTimeExpandable.setText(model.getOrderTime());
 
-                holder.constraintLayoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
-
-                return;
+                holder.layoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+                holder.arrow_icon_collapsed.setRotation(isVisible ? 180 : 0);
             }
 
-            //is Text ------------------------------------------------------------
 
-            holder.textView6.setVisibility(View.VISIBLE);
-            holder.orderItemDetails.setVisibility(View.VISIBLE);
-            holder.seekBarList.setVisibility(View.GONE);
-            holder.btnPlayPauseList.setVisibility(View.GONE);
-
-            if (model.getAdditionalComment() != null) {
-                holder.txtAdditional.setVisibility(View.VISIBLE);
-                holder.txtAdditional.setText("Message : " + model.getAdditionalComment());
-            } else if (model.getAdditionalComment() == null) {
-                holder.txtAdditional.setVisibility(View.GONE);
-            }
-            //  holder.txtAdditional.setVisibility(View.GONE);
-            Log.d("4554", "" + model.getAdditionalComment());
-            holder.txtTitleExpandable.setText(" New Order from  " + model.getOrderTitle());
-
-            holder.orderItemDetails.setText(model.getOrderDetails());
-            holder.txtTimeExpandable.setText(model.getOrderTime());
-
-
-            holder.constraintLayoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
-
+            holder.layoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+            holder.arrow_icon_collapsed.setRotation(isVisible ? 180 : 0);
             return;
         }
 
@@ -213,7 +207,9 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
         Glide.with(holder.imgUserAdapter.getContext()).load(imgUrl).into(holder.imgUserAdapter);
 
         boolean isVisible = dataList.get(position).isVisibility();
-        holder.constraintLayoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        holder.layoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        holder.arrow_icon_collapsed.setRotation(isVisible ? 180 : 0);
+
     }
 
     @Override
@@ -224,9 +220,9 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtTitleExpandable, textView6, txtTimeExpandable, txtPriceExpandable, orderItemDetails, txtAdditional;
-        ConstraintLayout constraintLayoutExpand;
+        LinearLayoutCompat layoutExpand, layoutAudioList, layoutTxtList;
         ConstraintLayout mainLayoutExpandable;
-        ImageView imgUserAdapter, btnPlayPauseList;
+        ImageView imgUserAdapter, btnPlayPauseList, arrow_icon_collapsed;
         SeekBar seekBarList;
         ProgressBar btnPlayPauseListAlt;
 
@@ -236,7 +232,7 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
             txtTimeExpandable = itemView.findViewById(R.id.txtTimeExpandable);
             txtPriceExpandable = itemView.findViewById(R.id.txtPriceExpandable);
             orderItemDetails = itemView.findViewById(R.id.orderItemDetails);
-            constraintLayoutExpand = itemView.findViewById(R.id.constraintLayoutExpand);
+            layoutExpand = itemView.findViewById(R.id.layoutExpand);
             mainLayoutExpandable = itemView.findViewById(R.id.mainLayoutExpandable);
             imgUserAdapter = itemView.findViewById(R.id.imgUserAdapter);
             txtAdditional = itemView.findViewById(R.id.txtAdditional);
@@ -245,27 +241,40 @@ public class ExpandableAdapter extends RecyclerView.Adapter<ExpandableAdapter.Vi
             btnPlayPauseList = itemView.findViewById(R.id.btnPlayPauseList);
             btnPlayPauseListAlt = itemView.findViewById(R.id.btnPlayPauseListAlt);
 
+            layoutAudioList = itemView.findViewById(R.id.layoutAudioList);
+            layoutTxtList = itemView.findViewById(R.id.layoutTxtList);
+            arrow_icon_collapsed = itemView.findViewById(R.id.arrow_icon_collapsed);
 
-            mainLayoutExpandable.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    for (int i = 0; i < dataList.size(); i++) {
-                        if (dataList.get(i).isVisibility() && i != getAdapterPosition()) {
-                            dataList.get(i).setVisibility(false);
-                            notifyItemChanged(i);
-                        }
-                    }
-                    Log.d("8989", " Open/close");
 
-                    if (mediaPlayer != null) {
-                        mediaPlayer.release();
-                        mediaPlayer = null;
-                        btnPlayPauseList.setImageResource(R.drawable.play);
+            RotateAnimation rotateAnimation;
+            if (arrow_icon_collapsed.getRotation() == 0) {
+                rotateAnimation = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            } else {
+                rotateAnimation = new RotateAnimation(180, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            }
+            rotateAnimation.setDuration(300);
+            rotateAnimation.setFillAfter(true);
+
+
+            mainLayoutExpandable.setOnClickListener(view -> {
+                arrow_icon_collapsed.startAnimation(rotateAnimation);
+
+                for (int i = 0; i < dataList.size(); i++) {
+                    if (dataList.get(i).isVisibility() && i != getAdapterPosition()) {
+                        dataList.get(i).setVisibility(false);
+                        notifyItemChanged(i);
                     }
-                    OrderModel orderModel = dataList.get(getAdapterPosition());
-                    orderModel.setVisibility(!orderModel.isVisibility());
-                    notifyItemChanged(getAdapterPosition());
                 }
+                Log.d("8989", " Open/close");
+
+                if (mediaPlayer != null) {
+                    mediaPlayer.release();
+                    mediaPlayer = null;
+                    btnPlayPauseList.setImageResource(R.drawable.play);
+                }
+                OrderModel orderModel = dataList.get(getAdapterPosition());
+                orderModel.setVisibility(!orderModel.isVisibility());
+                notifyItemChanged(getAdapterPosition());
             });
 
 

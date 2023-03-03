@@ -23,10 +23,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.tea.counter.R;
 import com.tea.counter.databinding.ActivitySellerBinding;
 import com.tea.counter.dialog.ConfirmOrderDialog;
-import com.tea.counter.ui.Sellerfragments.SBillFragment;
+import com.tea.counter.ui.Customerfragments.OrderFragment;
 import com.tea.counter.ui.Sellerfragments.SHomeFragment;
 import com.tea.counter.ui.Sellerfragments.SItemsFragment;
-import com.tea.counter.ui.Sellerfragments.SOrderFragment;
 import com.tea.counter.ui.Sellerfragments.SProfileFragment;
 import com.tea.counter.ui.notification.NotificationFragment;
 import com.tea.counter.utils.Constants;
@@ -54,18 +53,17 @@ public class SellerActivity extends AppCompatActivity {
     }
 // Check if there is a new notification that is not read
 
-    public void iconHighLite(){
+    public void iconHighLite() {
         boolean newNotificationNotRead = false;
         if (newNotificationNotRead) {
 
-          //  binding.btnNotification.setBackgroundResource(R.drawable.notification_icon_background);
+            //  binding.btnNotification.setBackgroundResource(R.drawable.notification_icon_background);
         }
 
     }
 
 
-
-    public void onClicks(){
+    public void onClicks() {
         binding.sellerNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -83,14 +81,14 @@ public class SellerActivity extends AppCompatActivity {
 
                 }
                 if (item.getItemId() == R.id.sellerOrder) {
-                    replaceFragment(new SOrderFragment());
+                    replaceFragment(new OrderFragment());
                 }
                 if (item.getItemId() == R.id.confirmOrder) {
                     ConfirmOrderDialog confirmOrderDialog = new ConfirmOrderDialog();
                     confirmOrderDialog.show(getSupportFragmentManager(), "Confirm_dialog");
                 }
                 if (item.getItemId() == R.id.sellerBill) {
-                    replaceFragment(new SBillFragment());
+                    replaceFragment(new BillFragment());
                 }
                 if (item.getItemId() == R.id.sellerProfile) {
                     replaceFragment(new SProfileFragment());

@@ -55,7 +55,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="70dp">
+                    android:layout_height="wrap_content">
 
 
                     <androidx.appcompat.widget.AppCompatEditText
@@ -63,8 +63,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_30sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:layout_marginEnd="@dimen/_30sdp"
                         android:hint="Additional Comment"
+                        android:maxLength="100"
+                        android:maxLines="2"
                         android:textColor="#FFFFFF"
                         android:textColorHint="#322E2E"
                         android:textSize="@dimen/_10sdp"
@@ -111,9 +113,6 @@
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 
 
 

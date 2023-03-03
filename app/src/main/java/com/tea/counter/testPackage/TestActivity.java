@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,13 +34,107 @@ public class TestActivity extends AppCompatActivity {
     private MediaRecorder mediaRecorder;
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_test);
+//     if (model.isAudio()) {
+//        mediaPlayer = new MediaPlayer();
+//        holder.textView6.setVisibility(View.GONE);
+//        holder.orderItemDetails.setVisibility(View.GONE);
+//        holder.seekBarList.setVisibility(View.VISIBLE);
+//        holder.btnPlayPauseList.setVisibility(View.VISIBLE);
+//
+//        holder.seekBarList.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//
+//            }
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//                mediaPlayer.seekTo(seekBar.getProgress());
+//            }
+//        });
+//        runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                if (mediaPlayer != null) {
+//                    int currentPosition = mediaPlayer.getCurrentPosition();
+//                    holder.seekBarList.setProgress(currentPosition);
+//                }
+//                handler.postDelayed(this, 10);
+//            }
+//        };
+//
+//        mediaPlayer.setOnPreparedListener(mp -> {
+//            // Set the maximum value of the seekbar to the duration of the media
+//            holder.seekBarList.setMax(mp.getDuration());
+//            // Start the handler to update the seekbar
+//            handler.postDelayed(runnable, 10);
+//        });
+//
+//        holder.btnPlayPauseList.setOnClickListener(v -> {
+//
+//            if (mediaPlayer.isPlaying()) {
+//                mediaPlayer.pause();
+//                holder.btnPlayPauseList.setImageResource(R.drawable.play);
+//            } else {
+//
+//                Log.e("TAG", "onClick: ");
+//
+//                if (!isPlayedOnce) {
+//                    holder.btnPlayPauseList.setVisibility(View.GONE);
+//                    holder.btnPlayPauseListAlt.setVisibility(View.VISIBLE);
+//
+//                    try {
+//                        mediaPlayer.setDataSource(model.getAudioUrl());
+//                        mediaPlayer.prepare();
+//                        isPlayedOnce = true;
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//
+//                if (isAudioPlaybackCompleted) {
+//                    mediaPlayer.reset();
+//                    try {
+//                        mediaPlayer.setDataSource(model.getAudioUrl());
+//                        mediaPlayer.prepare();
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    isAudioPlaybackCompleted = false;
+//                }
+//
+//                holder.btnPlayPauseList.setImageResource(R.drawable.pause);
+//                mediaPlayer.start();
+//                holder.btnPlayPauseListAlt.setVisibility(View.GONE);
+//                holder.btnPlayPauseList.setVisibility(View.VISIBLE);
+//            }
+//        });
+//
+//        mediaPlayer.setOnCompletionListener(mp -> {
+//            isAudioPlaybackCompleted = true;
+//            holder.btnPlayPauseList.setImageResource(R.drawable.play);
+//            handler.removeCallbacks(runnable);
+//        });
+//
+//        holder.txtTitleExpandable.setText(" New Voice Order from  " + model.getOrderTitle());
+//        holder.txtTimeExpandable.setText(model.getOrderTime());
+//
+//        holder.layoutExpand.setVisibility(isVisible ? View.VISIBLE : View.GONE);
 
-       // setUpRecordingView();
-    }
+//        return;
+//    }
+
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        binding = DataBindingUtil.setContentView(this, R.layout.activity_test);
+//
+//       // setUpRecordingView();
+//    }
 
 //    public void setUpRecordingView() {
 //

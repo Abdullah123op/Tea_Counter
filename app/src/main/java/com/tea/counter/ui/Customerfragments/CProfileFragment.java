@@ -253,16 +253,13 @@ public class CProfileFragment extends Fragment {
                 binding.etEditAddress.setEnabled(false);
                 binding.etEditCity.setEnabled(false);
 
-                binding.imgUserHome.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (binding.btnEdit.getVisibility() == View.VISIBLE) {
-                            ImageViewerDialog imageViewerDialog = new ImageViewerDialog();
-                            Bundle args = new Bundle();
-                            args.putString("imgUri", Preference.getImgUri(mContext));
-                            imageViewerDialog.setArguments(args);
-                            imageViewerDialog.show(getChildFragmentManager(), "image_dialog");
-                        }
+                binding.imgUserHome.setOnClickListener(v1 -> {
+                    if (binding.btnEdit.getVisibility() == View.VISIBLE) {
+                        ImageViewerDialog imageViewerDialog = new ImageViewerDialog();
+                        Bundle args = new Bundle();
+                        args.putString("imgUri", Preference.getImgUri(mContext));
+                        imageViewerDialog.setArguments(args);
+                        imageViewerDialog.show(getChildFragmentManager(), "image_dialog");
                     }
                 });
 
@@ -276,32 +273,26 @@ public class CProfileFragment extends Fragment {
 
         Toast.makeText(mContext, "Profile Image Is Updating...", Toast.LENGTH_SHORT).show();
         final StorageReference storageReference = storage.getReference().child("profileImage").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()));
-        storageReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        storageReference.putFile(imageUri).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            public void onSuccess(Uri uri) {
+                db.collection(Constants.COLLECTION_NAME).document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update(Constants.IMAGE, String.valueOf(uri)).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(Uri uri) {
-                        db.collection(Constants.COLLECTION_NAME).document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update(Constants.IMAGE, String.valueOf(uri)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(mContext, getString(R.string.update_image_message), Toast.LENGTH_SHORT).show();
-                                Preference.setImgUri(mContext, String.valueOf(uri));
-                                progressDialog.dismiss();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("TAG", "Error adding document", e);
-                                Toast.makeText(mContext, getText(R.string.failed_database_msg), Toast.LENGTH_SHORT).show();
-                                progressDialog.dismiss();
-                            }
-                        });
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(mContext, getString(R.string.update_image_message), Toast.LENGTH_SHORT).show();
+                        Preference.setImgUri(mContext, String.valueOf(uri));
+                        progressDialog.dismiss();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("TAG", "Error adding document", e);
+                        Toast.makeText(mContext, getText(R.string.failed_database_msg), Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                 });
             }
-        });
+        }));
     }
 
     @Override

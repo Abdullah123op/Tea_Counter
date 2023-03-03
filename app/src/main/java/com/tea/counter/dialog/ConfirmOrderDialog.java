@@ -95,7 +95,7 @@ public class ConfirmOrderDialog extends BottomSheetDialogFragment {
 //    @Override
 //    public Dialog onCreateDialog(Bundle savedInstanceState) {
 //        binding = DialogConfirmOrderBinding.inflate(LayoutInflater.from(mContext));
-//        return new AlertDialog.Builder(requireActivity()).setView(binding.getRoot()).create();
+//
 //    }
 
     @Nullable
@@ -194,10 +194,10 @@ public class ConfirmOrderDialog extends BottomSheetDialogFragment {
                                 if (dataList.get(i).getClick()) {
                                     orderedItemList.add(dataList.get(i));
                                     totalAmount = totalAmount + Double.parseDouble(dataList.get(i).getTotalPrice());
-                                    binding.txtTotalAmount.setText(totalAmount + "");
+                                    binding.txtTotalAmount.setText(String.format("%.2f", totalAmount));
                                 } else {
                                     totalAmount = totalAmount - Double.parseDouble(dataList.get(i).getTotalPrice());
-                                    binding.txtTotalAmount.setText(totalAmount + "");
+                                    binding.txtTotalAmount.setText(String.format("%.2f", totalAmount));
                                 }
                             }
                         }

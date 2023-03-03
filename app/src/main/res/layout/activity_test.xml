@@ -1,245 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainLayoutExpandable"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/_5sdp"
+
+    android:layout_marginTop="@dimen/_3sdp"
+    android:layout_marginEnd="@dimen/_5sdp"
+    android:background="@drawable/twocardviewbackground"
+    android:elevation="@dimen/_100sdp"
+    android:orientation="horizontal">
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgUserAdapter"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:paddingBottom="8dp"
+        android:src="@drawable/default_user"
+        app:layout_constraintBottom_toBottomOf="@+id/txtTimeExpandable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txtTitleExpandable" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtTitleExpandable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:text=" You Delivered to"
+        android:textColor="#fff"
+        android:textSize="@dimen/_10sdp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txtTimeExpandable"
+        app:layout_constraintStart_toEndOf="@+id/imgUserAdapter"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtTimeExpandable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:paddingBottom="8dp"
+        android:text=" 16 Jan, 11:44 PM"
+        android:textColor="#fff"
+        android:textSize="@dimen/_8sdp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/txtTitleExpandable"
+        app:layout_constraintTop_toBottomOf="@+id/txtTitleExpandable" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtPriceExpandable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:maxLines="1"
+        android:text="100"
+        android:textColor="#fff"
+        android:textSize="@dimen/_10sdp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayoutExpand"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/constraintLayoutExpand"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent">
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtTimeExpandable">
+
+        <View
+            android:id="@+id/underLine"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#8DFFFFFF" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layoutTxtList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/otp_dialog_design"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:orientation="horizontal"
+            android:visibility="visible">
 
-            <EditText
-                android:id="@+id/txtTitleMakeRequest"
+
+            <TextView
+                android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="28dp"
-                android:background="@android:color/transparent"
-                android:enabled="false"
-                android:text="Make a Request For Tea"
-                android:textColor="#FFFFFF"
-                android:textSize="24sp" />
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/spinnerSeller"
-                style="@style/CustomSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/_35sdp"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="@color/white" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewCustomerRequest"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/_30sdp"
+                android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="@dimen/_30sdp"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/_2sdp"
-                android:paddingBottom="@dimen/_2sdp"
-                android:visibility="visible"
-                android:layout_weight="1"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                android:layout_marginBottom="8dp"
+                android:maxLines="1"
+                android:text=" Order Details"
+                android:textColor="#fff"
+                android:textSize="@dimen/_8sdp"
+                android:textStyle="bold"
+                android:visibility="visible" />
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/etAdditionalComment"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_30sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:hint="Additional Comment"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#322E2E"
-                        android:textSize="@dimen/_10sdp"
-                        android:visibility="visible"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/record_button"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-
-                    <com.devlomi.record_view.RecordView
-                        android:id="@+id/record_view"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_toLeftOf="@id/record_button"
-                        android:visibility="gone"
-                        app:counter_time_color="#ff0000"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/record_button"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
-                        app:slide_to_cancel_arrow_color="#000000"
-                        app:slide_to_cancel_bounds="8dp"
-                        app:slide_to_cancel_margin_right="10dp"
-                        app:slide_to_cancel_text="Slide To Cancel" />
-
-                    <com.devlomi.record_view.RecordButton
-                        android:id="@+id/record_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginEnd="24dp"
-                        android:background="@drawable/recv_bg_mic"
-                        android:scaleType="centerInside"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:mic_icon="@drawable/recv_ic_mic_white" />
-
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/audioPlayerView"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginStart="@dimen/_30sdp"
-                android:layout_marginEnd="@dimen/_30sdp"
-                android:layout_marginBottom="16dp"
-                android:orientation="vertical"
-                android:visibility="gone"
-
-                >
-
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/animationView"
-                    android:layout_width="221dp"
-                    android:layout_height="80dp"
-                    android:scaleX="2"
-                    android:scaleY="2"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="@+id/seekBar"
-                    app:layout_constraintStart_toStartOf="@+id/seekBar"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:lottie_autoPlay="true"
-                    app:lottie_fileName="audio_playing.json"
-                    app:lottie_loop="true"
-                    app:lottie_speed="1" />
-
-                <SeekBar
-                    android:id="@+id/seekBar"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/animationView" />
-
-                <ImageView
-                    android:id="@+id/btnPlayPause"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="60dp"
-                    android:background="@drawable/btnbackground"
-                    android:elevation="5dp"
-                    android:padding="@dimen/_4sdp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/seekBar"
-                    app:srcCompat="@drawable/pause" />
-
-                <ImageView
-                    android:id="@+id/btnDeleteAudio"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="60dp"
-
-                    android:background="@drawable/btncancelbackground"
-                    android:elevation="5dp"
-                    android:padding="@dimen/_6sdp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/seekBar"
-                    app:srcCompat="@drawable/baseline_delete_24" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/btnLayoutRequest"
+            <TextView
+                android:id="@+id/txtAdditional"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
+                android:layout_marginStart="@dimen/_40sdp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="@dimen/_50sdp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:maxWidth="@dimen/_100sdp"
+                android:maxLines="3"
+                android:text="Commentsdfd"
+                android:textColor="#fff"
+                android:textSize="@dimen/_8sdp"
+                android:textStyle="bold"
+                android:visibility="invisible" />
 
-                <ProgressBar
-                    android:id="@+id/progressBarRequest"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="25dp"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/etAdditionalComment" />
+            <TextView
+                android:id="@+id/orderItemDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:text=" Order real "
+                android:textColor="#fff"
+                android:textSize="@dimen/_8sdp"
+                android:visibility="visible" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnRequest"
-                    android:layout_width="@dimen/_125sdp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_6sdp"
-                    android:layout_marginEnd="@dimen/_10sdp"
-                    android:layout_marginBottom="@dimen/_20sdp"
-                    android:background="@drawable/btnbackground"
-                    android:text="Request"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnCancelInRequestDialog"
-                    android:layout_width="@dimen/_125sdp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_marginTop="@dimen/_6sdp"
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
-                    android:layout_marginBottom="@dimen/_2sdp"
-                    android:background="@drawable/btncancelbackground"
-                    android:text="@string/btn_cancel_txt"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
 
-                    android:visibility="visible" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layoutAudioList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="horizontal">
 
+            <ImageView
+                android:id="@+id/btnPlayPauseList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:padding="@dimen/_10sdp"
+                android:visibility="visible"
+                app:srcCompat="@drawable/play" />
+
+            <ProgressBar
+                android:id="@+id/btnPlayPauseListAlt"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:padding="@dimen/_5sdp"
+                android:visibility="gone" />
+
+            <SeekBar
+                android:id="@+id/seekBarList"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:visibility="visible" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-</layout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

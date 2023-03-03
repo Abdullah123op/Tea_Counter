@@ -9,12 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -69,6 +68,15 @@ public class SItemsFragment extends Fragment {
                 binding.btnAddItemSubmit.setVisibility(View.GONE);
                 binding.progressBar.setVisibility(View.VISIBLE);
                 if (!Objects.requireNonNull(binding.etItemName.getText()).toString().isEmpty() && !Objects.requireNonNull(binding.etPrice.getText()).toString().isEmpty()) {
+                    View rootView = getView();
+                    if (rootView != null) {
+                        View currentFocus = rootView.findFocus();
+                        if (currentFocus != null) {
+                            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+                        }
+                    }
+
                     addArrayListdb();
                     getArrayList();
 
@@ -79,9 +87,7 @@ public class SItemsFragment extends Fragment {
                 }
             }
         });
-        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
-        layoutManager.setOrientation(RecyclerView.VERTICAL);
-        binding.itemRecyclerView.setLayoutManager(layoutManager);
+
     }
 
 

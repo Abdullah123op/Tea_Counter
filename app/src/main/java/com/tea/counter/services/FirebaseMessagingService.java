@@ -60,11 +60,12 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
 
         Intent resultIntent = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            resultIntent = new Intent(this, SplashScreen.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                resultIntent = new Intent(this, SplashScreen.class);
+            }
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_IMMUTABLE);
-
 
         builder.setContentTitle(remoteMessage.getNotification().getTitle());
         builder.setContentText(remoteMessage.getNotification().getBody());
@@ -75,7 +76,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "TeaApp";
             NotificationChannel channel = new NotificationChannel(channelId, "Channel human readable title", NotificationManager.IMPORTANCE_HIGH);
@@ -83,8 +83,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             builder.setChannelId(channelId);
         }
 
-
-// notificationId is a unique int for each notification that you must define
+//   notificationId is a unique int for each notification that you must define
         mNotificationManager.notify(100, builder.build());
 
 

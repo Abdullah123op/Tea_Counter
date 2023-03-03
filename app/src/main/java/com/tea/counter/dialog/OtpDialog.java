@@ -9,6 +9,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -109,6 +111,24 @@ public class OtpDialog extends BottomSheetDialogFragment {
             binding.txtMbNuberDialog.setText(phoneNumber);
 //            autoChangeEdittext();
             autoChangeField();
+
+            binding.etC6.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    binding.btnSubmitInDialog1.performClick();
+                }
+            });
+
             binding.btnSubmitInDialog1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
