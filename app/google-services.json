@@ -7,12 +7,49 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:910460482301:android:907024e488bdb1db428494",
+        "android_client_info": {
+          "package_name": "com.my.medtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "910460482301-arqjv386gu86nbq9lfbrj36n4ltkp14u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqSGbFoTFUMPLgceKmdYIUTLq1L_rifYY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "910460482301-arqjv386gu86nbq9lfbrj36n4ltkp14u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:910460482301:android:b82a8cfc117f31c1428494",
         "android_client_info": {
           "package_name": "com.tea.counter"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "910460482301-vdgg3sd0tpdmo7cv6qlcpuf5gebsj1f0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tea.counter",
+            "certificate_hash": "f6b317f9561e9c95572d87354ba5a1456708ab5d"
+          }
+        },
         {
           "client_id": "910460482301-arqjv386gu86nbq9lfbrj36n4ltkp14u.apps.googleusercontent.com",
           "client_type": 3
