@@ -40,11 +40,11 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onAnimationEnd(@NonNull Animator animation) {
                 if (Preference.getIsLogin(SplashActivity.this)) {
-                    //   AlreadyLogin();
-                    startActivity(new Intent(SplashActivity.this, SignUpActivity.class));
+                      AlreadyLogin();
+                  //  startActivity(new Intent(SplashActivity.this, SignUpActivity.class));
                 } else {
-                    // Startlogin();
-                    startActivity(new Intent(SplashActivity.this, SignUpActivity.class));
+                    Startlogin();
+                   // startActivity(new Intent(SplashActivity.this, SignUpActivity.class));
                 }
 
             }

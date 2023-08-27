@@ -36,7 +36,6 @@
             android:name=".ui.CustomerActivity"
             android:exported="true">
 
-
         </activity>
         <activity
             android:name=".testPackage.TestActivity"
