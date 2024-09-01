@@ -1,3 +1,4 @@
+![alt text](https://github.com/Abdullah123op/Tea_Counter/blob/master/app/src/main/res/drawable/tea_counter.png?raw=true)
 
 # Tea Counter
 
