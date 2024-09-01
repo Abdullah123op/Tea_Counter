@@ -40,10 +40,10 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onAnimationEnd(@NonNull Animator animation) {
                 if (Preference.getIsLogin(SplashActivity.this)) {
-                      AlreadyLogin();
+                      alreadyLogin();
                   //  startActivity(new Intent(SplashActivity.this, SignUpActivity.class));
                 } else {
-                    Startlogin();
+                    startLogin();
                    // startActivity(new Intent(SplashActivity.this, SignUpActivity.class));
                 }
 
@@ -61,7 +61,7 @@ public class SplashActivity extends AppCompatActivity {
         });
     }
 
-    public void AlreadyLogin() {
+    public void alreadyLogin() {
         if (Preference.getUserType(SplashActivity.this).equals("0")) {
             startActivity(new Intent(SplashActivity.this, SellerActivity.class));
         } else if (Preference.getUserType(SplashActivity.this).equals("1")) {
@@ -70,7 +70,7 @@ public class SplashActivity extends AppCompatActivity {
         finish();
     }
 
-    public void Startlogin() {
+    public void startLogin() {
         startActivity(new Intent(SplashActivity.this, LoginActivity.class));
         finish();
     }
